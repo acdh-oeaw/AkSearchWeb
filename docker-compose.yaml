@@ -1,0 +1,41 @@
+version: "2"
+services:
+  ak-solr:
+    image: acdhch/aksearch-solr
+    environment:
+    - JAVA_OPTS="-XX:+UseConcMarkSweepGC -XX:MaxHeapFreeRatio=20 -XX:MinHeapFreeRatio=10 -XX:GCTimeRatio=20"
+    volumes:
+    - ak-solrlogs:/opt/solr/server/logs
+    - ak-solrcores:/opt/solr/server/solr/mycores
+    networks:
+    - backend
+  ak-mysql:
+    image: mariadb:10
+    environment:
+    - MYSQL_ROOT_PASSWORD=123qwe
+    volumes:
+    - ak-mysql:/var/lib/mysql
+    networks:
+    - backend
+  ak-web:
+    image: acdhch/aksearch-web
+    environment:
+    - DB_PSWD=zxcasd
+    - DB_HOST=ak-mysql
+    - DB_ROOT_PSWD=123qwe
+    - SOLR_URL=http://ak-solr:8983/solr
+    - ALMA_KEY=xxx
+    networks:
+    - backend
+    - bridge
+    depends_on:
+    - ak-mysql
+networks:
+  backend:
+    driver: bridge
+  bridge:
+volumes:
+  ak-solrlogs:
+  ak-solrcores:
+  ak-mysql:
+   
