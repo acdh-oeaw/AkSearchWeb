@@ -63,6 +63,9 @@ services:
 ## Extending
 
 * Modify VuFind/AkSearch configuration files by adding adjusted versions to the `local` directory of this repo.
+    * **By no means add any confidential data to this repository** (e.g. API tokens, database passwords, etc.).
+      Such a data should be passed only using environment variables at runtime and the `start.sh` script should put them in the right target places.
+      If you don't know how to do it, contact Mateusz.
 * If you modify application code:
     * Develop it in a separate repository and deploy it as a composer package.
     * Indicate that this image depdends on it by adding corresponding composer package name (and version) to the `composer.json` file in this repository root.
