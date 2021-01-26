@@ -25,6 +25,8 @@ services:
     - DB_ROOT_PSWD=123qwe
     - SOLR_URL=http://ak-solr:8983/solr
     - ALMA_KEY=xxx
+    ports:
+    - "80:80"
     networks:
     - backend
     - bridge
