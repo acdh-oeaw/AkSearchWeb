@@ -60,6 +60,34 @@ services:
     - /full/path/on/your/machine:/var/www/local
 ```
 
+## Extending
+
+* Modify VuFind/AkSearch configuration files by adding adjusted versions to the `local` directory of this repo.
+* If you modify application code:
+    * Develop it in a separate repository and deploy it as a composer package.
+    * Indicate that this image depdends on it by adding corresponding composer package name (and version) to the `composer.json` file in this repository root.
+* Commit changes to this repository and push it to GitHub.
+    * The acdhch/aksearch-web image will be rebuild automatically.
+      Depending on Docker Hub servers load it can take from few minutes to an hour.
+    * If you don't want to wait, you can build the image on your own.
+      Just run `docker build -t acdhch/aksearch-web pathToThisRepoOnYourMachine`.
+      In such a case you can skip the next step.
+* Pull the current acdhch/aksearch-web image to your local docker registry (run `docker pull acdhch/aksearch-web`)
+
+### Checking how your packages work with VuFind/AkSearch
+
+While developing your packages you might want to test the *live*. For that just mount your module sources under `/var/www/vufind/vendor/{yourAccount}/{yourPackage}` in the `aksearch-web` container.
+
+E.g. if your module is published on packagist.org under `acdh-oeaw/my-module` and you store it under `d:/acdh/mymodule`, add `-v d:/acdh/mymodule:/var/www/vufind/vendor/acdh-oeaw/my-module` to the `docker run` call.
+
+And if you are using `docker-compose.yaml`, just add a correspongin `volumes` section (or entry in this section if it exists already), e.g.:
+```yaml
+services:
+  ak-web:
+    volumes:
+    - d:/acdh/mymodule:/var/www/vufind/vendor/acdh-oeaw/my-module
+```
+
 ## Solr and/or MariaDb deployment using attached docker-compose.yaml
 
 The easiest way to deploy dependencies is to use the `docker-compose.yaml` file provided by this repository.
