@@ -39,7 +39,7 @@ DB_NAME=${DB_NAME:=vufind}
 DB_ROOT=${DB_ROOT:=root}
 DB_CONN_STR="mysql://$DB_USER:$DB_PSWD@$DB_HOST/$DB_NAME"
 
-for i in {1..5}; do
+for i in {1..10}; do
     dbok=`mysql -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -e "show databases;"`
     if [ "$dbok" == "" ]; then
         dbok=`mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "show databases;"`
@@ -47,7 +47,7 @@ for i in {1..5}; do
     if [ "$?" == "0" ]; then
         break
     fi
-    sleep 1
+    sleep 2
 done
 if [ "$?" != "0" ]; then
     echo "Wrong database connection settings - check DB_HOST, DB_USER, DB_PSWD, DB_ROOT and DB_ROOT_PSWD environment variables"
