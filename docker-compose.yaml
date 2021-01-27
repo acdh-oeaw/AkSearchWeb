@@ -6,7 +6,7 @@ services:
     - JAVA_OPTS="-XX:+UseConcMarkSweepGC -XX:MaxHeapFreeRatio=20 -XX:MinHeapFreeRatio=10 -XX:GCTimeRatio=20"
     volumes:
     - ak-solrlogs:/opt/solr/server/logs
-    - ak-solrcores:/opt/solr/server/solr/mycores
+    - ak-solrdata:/opt/solr/server/solr
     networks:
     - backend
   ak-mysql:
@@ -38,6 +38,6 @@ networks:
   bridge:
 volumes:
   ak-solrlogs:
-  ak-solrcores:
+  ak-solrdata:
   ak-mysql:
    
