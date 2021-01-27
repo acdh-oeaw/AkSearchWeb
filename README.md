@@ -66,6 +66,8 @@ Docker doesn't update images automatically, so every time you want to make sure 
 
 Same goes for other images (in our case `acdhch/aksearch-solr` for the Solr backend and `mariadb:10` for the MariaDb backend).
 
+If you are using `docker-compose`, you can run `docker-compose pull` to update all of them at once.
+
 ## Extending
 
 * Modify VuFind/AkSearch **configuration files** by adding adjusted versions to the `local` directory of this repo.
