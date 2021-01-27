@@ -107,4 +107,22 @@ The easiest way to deploy dependencies is to use the `docker-compose.yaml` file 
   ```bash
   docker-compose up
   ```
+    * To shut down containers just hit `CTRL+C` on the console where `docker-compose up` displays containers' logs.
+
+## Importing sample data
+
+Follow instructions in the [AkSearchSolr](https://github.com/acdh-oeaw/AkSearchSolr#importing-sample-marc-data) repository.
+
+## Appendix - useful Docker commands
+
+If you are a Docker newbie:
+
+* `docker ps -a` lists containers and their state.
+* `docker exec -ti container_name bash` runs a console inside a given container (something like using ssh to get a console on a remote server).
+* `docker rm -fv container_name` removes a given container.
+* `docker volume list` lists all defined volumes. Volumes are like disk partitions - they provide persistent storage which survives container removal. There are a few tricky things about them:
+    * As they survive container removal, you must remove them by hand (see below) to fully clean up your machine.
+    * If a volume doesn't exist, it's created empty (it especially meand that if you mount it under `/some/path` in the container, `/some/path` content from the container's image won't be copied to the volume). This means if you need volumes to be initially filled with data, your container's startup scripts must take care of it (e.g. https://github.com/acdh-oeaw/AkSearchSolr/blob/main/aksearch.sh in the Solr container here - *if Solr cores directory is empty, initialize it with a template, otherwise do nothing*)
+    * You can't see volumes content directly from host filesystem (at least without using black magick ;-) ). On one hand that's inconvenient but on the other it allows to avoid all the file permissions issues (for smooth sharing files between the host and a docker container the host and the container should also share users and groups database which is rarely a case).
+* `docker volume rm volume_name` removes a given volume. As volumes survive container removal you must delete them by hand to fully clean up your machine.
 
