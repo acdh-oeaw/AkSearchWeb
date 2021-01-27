@@ -7,7 +7,6 @@ services:
     volumes:
     - ak-solrlogs:/opt/solr/server/logs
     - ak-solrcores:/opt/solr/server/solr/mycores
-    - /home/zozlak/roboty/ACDH/acdhresources/deployment/marcdata:/marcdata
     networks:
     - backend
   ak-mysql:

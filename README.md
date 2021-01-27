@@ -60,15 +60,25 @@ services:
     - /full/path/on/your/machine:/var/www/local
 ```
 
+## Keeping up to date
+
+Docker doesn't update images automatically, so every time you want to make sure you are using an up to date version run `docker pull acdhch/aksearch-web`.
+
+Same goes for other images (in our case `acdhch/aksearch-solr` for the Solr backend and `mariadb:10` for the MariaDb backend).
+
 ## Extending
 
-* Modify VuFind/AkSearch configuration files by adding adjusted versions to the `local` directory of this repo.
+* Modify VuFind/AkSearch **configuration files** by adding adjusted versions to the `local` directory of this repo.
     * **By no means add any confidential data to this repository** (e.g. API tokens, database passwords, etc.).
       Such a data should be passed only using environment variables at runtime and the `start.sh` script should put them in the right target places.
       If you don't know how to do it, contact Mateusz.
-* If you modify application code:
+* If you modify **application code**:
     * Develop it in a separate repository and deploy it as a composer package.
-    * Indicate that this image depdends on it by adding corresponding composer package name (and version) to the `composer.json` file in this repository root.
+    * Indicate that this image depends on it by adding corresponding composer package name (and version) to the `composer.json` file in this repository root.
+* If you create a new **theme**:
+    * Develop it in a separate repository and deploy it as a composer package.
+    * Indicate that this image depends on it by adding corresponding composer package name (and version) to the `composer.json` file in this repository root.
+    * Add creating of a symlink from the VuFind/AkSearch installation dir to the directory where composer installs your theme package
 * Commit changes to this repository and push it to GitHub.
     * The acdhch/aksearch-web image will be rebuild automatically.
       Depending on Docker Hub servers load it can take from few minutes to an hour.
@@ -81,15 +91,9 @@ services:
 
 While developing your packages you might want to test the *live*. For that just mount your module sources under `/var/www/vufind/vendor/{yourAccount}/{yourPackage}` in the `aksearch-web` container.
 
-E.g. if your module is published on packagist.org under `acdh-oeaw/my-module` and you store it under `d:/acdh/mymodule`, add `-v d:/acdh/mymodule:/var/www/vufind/vendor/acdh-oeaw/my-module` to the `docker run` call.
+Same goes with testing live the changes you are making in this repository's `local` directory. Just mount this directory under `/var/www/local` in `aksearch-web` container.
 
-And if you are using `docker-compose.yaml`, just add a correspongin `volumes` section (or entry in this section if it exists already), e.g.:
-```yaml
-services:
-  ak-web:
-    volumes:
-    - d:/acdh/mymodule:/var/www/vufind/vendor/acdh-oeaw/my-module
-```
+See the *Appendix - useful Docker commands* below for instructions on mounting host directories in a Docker container.
 
 ## Solr and/or MariaDb deployment using attached docker-compose.yaml
 
@@ -125,4 +129,19 @@ If you are a Docker newbie:
     * If a volume doesn't exist, it's created empty (it especially meand that if you mount it under `/some/path` in the container, `/some/path` content from the container's image won't be copied to the volume). This means if you need volumes to be initially filled with data, your container's startup scripts must take care of it (e.g. https://github.com/acdh-oeaw/AkSearchSolr/blob/main/aksearch.sh in the Solr container here - *if Solr cores directory is empty, initialize it with a template, otherwise do nothing*)
     * You can't see volumes content directly from host filesystem (at least without using black magick ;-) ). On one hand that's inconvenient but on the other it allows to avoid all the file permissions issues (for smooth sharing files between the host and a docker container the host and the container should also share users and groups database which is rarely a case).
 * `docker volume rm volume_name` removes a given volume. As volumes survive container removal you must delete them by hand to fully clean up your machine.
+
+### Mounting host directories inside a Docker container
+
+Let's say you want to mount the `d:/my/host/dir` under `/container/dir` in a Docker container.
+
+* If you run the container using `docker run`, just add a `-v d:/my/host/dir:/container/dir` to the `docker run` call.
+* If you are using `docker-compose up` and the `docker-composer.yaml`, add a corresponding `volume` section to your container definition, e.g.:
+  ```yaml
+  services:
+    ak-web:
+      volumes:
+      - d:/my/host/dir:/container/dir
+  ```
+
+**Be aware** that mounting data from host into a Docker container may cause file permissions issues. The user account used for running the code inside the Docker container may have unsufficient priviledges to access (less likely) or create/modify (very likely) data you mounted from host. There are three workarounds. First, granting everyone read/write rights on the data you are mounting (you should grant them in the host system). Second, use the root account inside the Docker container. Third, synchronize UIDs of the host and Docker container user accounts (but if you are reading this sentence, you should stick to the first or second workaround).
 

@@ -1,4 +1,8 @@
 {
     "require": {
+    },
+    "scripts": {
+        "post-install-cmd": "",
+        "post-update-cmd": ""
     }
 }

@@ -2,6 +2,7 @@
 
 export VUFIND_HOME=${VUFIND_HOME:=/usr/local/vufind}
 export VUFIND_LOCAL_DIR=${VUFIND_LOCAL_DIR:=/var/www/local}
+export VUFIND_CACHE_DIR=${VUFIND_CACHE_DIR:=/var/www/cache}
 
 function cfgReplace {
     for cfgfile in `grep -Rl -E "$1" $VUFIND_HOME/config`; do
@@ -78,6 +79,7 @@ cfgReplace '^url *=.*http.+/solr' "url = $SOLR_URL"
 
 ### Apache
 sed -i -E "s|^.*SetEnv +VUFIND_LOCAL_DIR.*|SetEnv VUFIND_LOCAL_DIR \"$VUFIND_LOCAL_DIR\"|g" /etc/apache2/conf-enabled/vufind.conf
+sed -i -E "s|^.*SetEnv +VUFIND_CACHE_DIR.*|SetEnv VUFIND_CACHE_DIR \"$VUFIND_CACHE_DIR\"|g" /etc/apache2/conf-enabled/vufind.conf
 
 ### Run Apache
 echo "Starting Apache..."
