@@ -84,7 +84,7 @@ If you are using `docker-compose`, you can run `docker-compose pull` to update a
 * If you create a new **theme**:
     * Develop it in a separate repository and deploy it as a composer package.
     * Indicate that this image depends on it by adding corresponding composer package name (and version) to the `composer.json` file in this repository root.
-    * Add creating of a symlink from the VuFind/AkSearch installation dir to the directory where composer installs your theme package
+    * Add creating of a symlink from the VuFind/AkSearch installation dir to the directory where composer installs your theme package to the `start.sh` script.
 * Commit changes to this repository and push it to GitHub.
     * The acdhch/aksearch-web image will be rebuild automatically.
       Depending on Docker Hub servers load it can take from few minutes to an hour.
