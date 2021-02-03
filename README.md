@@ -11,7 +11,11 @@ Both of them can be deployed usind the `docker-compose.yaml` located in this rep
 
 You must pass information about location of Solr and MySQL/MariaDb database using environment variables (see the *Environment variables* section below).
 
-## Deployment
+## Deployment on ACDH servers
+
+Deployment on Portainer is done automatically (there is a service checking for new versions of docker images on docker hub and redeploying services when a new version is available).
+
+## Local deployment
 
 Use `docker run`, e.g. (just adjust environment variable values!) :
 
