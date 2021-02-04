@@ -5,11 +5,5 @@
     "scripts": {
         "post-install-cmd": "",
         "post-update-cmd": ""
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url":  "https://github.com/acdh-oeaw/AkSearchExtend.git"
-        }
-    ]
+    }
 }
