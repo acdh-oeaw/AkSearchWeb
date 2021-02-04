@@ -23,16 +23,18 @@ If connections with Solr and MySQL/MariaDb database works fine, you should be ab
 
 ### Environment variables
 
-| Env Var      | Required | Default | Description                                                            |
-|--------------|----------|---------|------------------------------------------------------------------------|
-| SOLR_URL     |    +     |         | URL of the Solr backend, e.g. http://my.server:8983/solr               |
-| ALMA_KEY     |    +     |         | Your Alma API authorization token                                      |
-| DB_HOST      |    +     |         | Server name/IP of your MySQL/MariaDb database                          |
-| DB_PSWD      |    +     |         | Password for your MySQL/MariaDb database                               |
-| DB_USER      |          | vufind  | User name for accessing your MySQL/MariaDb database                    |
-| DB_NAME      |          | vufind  | Your MySQL/MariaDb database name                                       |
-| DB_ROOT      |   +/-    | root    | Name of your MySQL/MariaDb database superuser account (see below)      |
-| DB_ROOT_PSWD |   +/-    |         | Password for your MySQL/MariaDb database superuser account (see below) |
+| Environment Variable | Required | Default | Description                                                            |
+|----------------------|----------|---------|------------------------------------------------------------------------|
+| SOLR_URL             |    +     |         | URL of the Solr backend, e.g. http://my.server:8983/solr               |
+| ALMA_KEY             |    +     |         | Your Alma API authorization token                                      |
+| DB_HOST              |    +     |         | Server name/IP of your MySQL/MariaDb database                          |
+| DB_PSWD              |    +     |         | Password for your MySQL/MariaDb database                               |
+| DB_USER              |          | vufind  | User name for accessing your MySQL/MariaDb database                    |
+| DB_NAME              |          | vufind  | Your MySQL/MariaDb database name                                       |
+| DB_ROOT              |   +/-    | root    | Name of your MySQL/MariaDb database superuser account (see below)      |
+| DB_ROOT_PSWD         |   +/-    |         | Password for your MySQL/MariaDb database superuser account (see below) |
+| VUFIND_LOCAL_MODULES |          | AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch | Coma separarated list of Zend2 modules to be enabled (on top of VuFind ones) |
+| APPLICATION_ENV      |          |         | Set to 'development' to avoid Zend configuration caching (which may cause troubles with live development) |
 
 #### DB_ROOT_PSWD and DB_ROOT
 

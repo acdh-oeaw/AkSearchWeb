@@ -17,7 +17,6 @@ RUN apt update &&\
     ln -s /usr/local/vufind/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
     # environment variables are set by the start.sh script (which allows setting them by `docker run`) \
     sed -i -e 's/ SetEnv/ #SetEnv/g' /etc/apache2/conf-enabled/vufind.conf &&\
-    sed -i -E 's|^.*SetEnv +VUFIND_LOCAL_MODULES.*|SetEnv VUFIND_LOCAL_MODULES AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch|g' /etc/apache2/conf-enabled/vufind.conf &&\
     # /var/www is www-data user home - ownership allows composer to create cache, etc. \
     chown -R www-data:www-data /var/www /usr/local/vufind &&\
     ### Other \
@@ -26,7 +25,7 @@ RUN apt update &&\
 COPY composer.json /usr/local/vufind/composer.local.json
 ### AkSearch config tuning which can be done as a www-data user
 USER www-data
-RUN cd /usr/local/vufind &&\
+RUN cd /usr/local/vufind &&\ 
     # remove autoinstallation code - solr is in a separate container and we don't need swaggerui \
     sed -i -e 's/^.*@phing-install-dependencies.*$//g' -e 's/"phing installsolr installswaggerui",/"phing installsolr installswaggerui"/g' composer.json &&\
     composer update &&\
@@ -35,4 +34,4 @@ RUN cd /usr/local/vufind &&\
     mkdir /var/www/cache
 USER root
 CMD ["/var/www/start.sh"]
-ENV VUFIND_HOME=/usr/local/vufind VUFIND_LOCAL_DIR=/var/www/local VUFIND_CACHE_DIR=/var/www/cache
+ENV VUFIND_HOME=/usr/local/vufind VUFIND_LOCAL_DIR=/var/www/local VUFIND_CACHE_DIR=/var/www/cache VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch
