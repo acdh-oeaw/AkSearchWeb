@@ -1,8 +1,15 @@
 {
     "require": {
+        "acdh-oeaw/aksearch-ext": ">=0.2"
     },
     "scripts": {
         "post-install-cmd": "",
         "post-update-cmd": ""
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "https://github.com/acdh-oeaw/AkSearchExtend.git"
+        }
+    ]
 }
