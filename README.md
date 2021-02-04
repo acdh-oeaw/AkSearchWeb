@@ -11,7 +11,11 @@ Both of them can be deployed usind the `docker-compose.yaml` located in this rep
 
 You must pass information about location of Solr and MySQL/MariaDb database using environment variables (see the *Environment variables* section below).
 
-## Deployment
+## Deployment on ACDH servers
+
+Deployment on Portainer is done automatically (there is a service checking for new versions of docker images on docker hub and redeploying services when a new version is available).
+
+## Local deployment
 
 Use `docker run`, e.g. (just adjust environment variable values!) :
 
@@ -68,6 +72,8 @@ Docker doesn't update images automatically, so every time you want to make sure 
 
 Same goes for other images (in our case `acdhch/aksearch-solr` for the Solr backend and `mariadb:10` for the MariaDb backend).
 
+If you are using `docker-compose`, you can run `docker-compose pull` to update all of them at once.
+
 ## Extending
 
 * Modify VuFind/AkSearch **configuration files** by adding adjusted versions to the `local` directory of this repo.
@@ -80,7 +86,7 @@ Same goes for other images (in our case `acdhch/aksearch-solr` for the Solr back
 * If you create a new **theme**:
     * Develop it in a separate repository and deploy it as a composer package.
     * Indicate that this image depends on it by adding corresponding composer package name (and version) to the `composer.json` file in this repository root.
-    * Add creating of a symlink from the VuFind/AkSearch installation dir to the directory where composer installs your theme package
+    * Add creating of a symlink from the VuFind/AkSearch installation dir to the directory where composer installs your theme package to the `start.sh` script.
 * Commit changes to this repository and push it to GitHub.
     * The acdhch/aksearch-web image will be rebuild automatically.
       Depending on Docker Hub servers load it can take from few minutes to an hour.
