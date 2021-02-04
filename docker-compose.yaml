@@ -25,6 +25,8 @@ services:
     - DB_ROOT_PSWD=123qwe
     - SOLR_URL=http://ak-solr:8983/solr
     - ALMA_KEY=xxx
+    - VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
+    - APPLICATION_ENV=development
     ports:
     - "80:80"
     networks:
