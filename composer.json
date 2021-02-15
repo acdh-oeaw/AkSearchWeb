@@ -1,5 +1,6 @@
 {
     "require": {
+        "acdh-oeaw/ak-search-acdh-theme": "*",
         "acdh-oeaw/aksearch-ext": ">=0.2"
     },
     "scripts": {
