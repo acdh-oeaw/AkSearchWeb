@@ -77,6 +77,14 @@ if [ "$SOLR_URL" == "" ]; then
 fi
 cfgReplace '^url *=.*http.+/solr' "url = $SOLR_URL"
 
+##check the ACDH theme dir
+if [ ! -e "$VUFIND_HOME/themes/AcdhchTheme" ]; then
+    mkdir -p "$VUFIND_HOME/themes/AcdhchTheme"
+fi
+
+##copy the theme
+cp -rf $VUFIND_HOME/vendor/acdh-oeaw/ak-search-acdh-theme/* $VUFIND_HOME/themes/AcdhchTheme/
+
 ### Apache
 sed -i -E "s|^.*SetEnv +VUFIND_LOCAL_DIR.*|SetEnv VUFIND_LOCAL_DIR \"$VUFIND_LOCAL_DIR\"|g" /etc/apache2/conf-enabled/vufind.conf
 sed -i -E "s|^.*SetEnv +VUFIND_CACHE_DIR.*|SetEnv VUFIND_CACHE_DIR \"$VUFIND_CACHE_DIR\"|g" /etc/apache2/conf-enabled/vufind.conf
