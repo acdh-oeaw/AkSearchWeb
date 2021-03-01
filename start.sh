@@ -89,7 +89,8 @@ cp -rf $VUFIND_HOME/vendor/acdh-oeaw/ak-search-acdh-theme/* $VUFIND_HOME/themes/
 sed -i -E "s|^.*SetEnv +VUFIND_LOCAL_DIR.*|SetEnv VUFIND_LOCAL_DIR \"$VUFIND_LOCAL_DIR\"|g" /etc/apache2/conf-enabled/vufind.conf
 sed -i -E "s|^.*SetEnv +VUFIND_CACHE_DIR.*|SetEnv VUFIND_CACHE_DIR \"$VUFIND_CACHE_DIR\"|g" /etc/apache2/conf-enabled/vufind.conf
 sed -i -E "s|^.*SetEnv +VUFIND_LOCAL_MODULES.*|SetEnv VUFIND_LOCAL_MODULES $VUFIND_LOCAL_MODULES|g" /etc/apache2/conf-enabled/vufind.conf
-sed -i -E "s|^.*SetEnv +VUFIND_ENV.*|SetEnv VUFIND_ENV \"$VUFIND_ENV\"|g" /etc/apache2/conf-enabled/vufind.conf
+sed -i -E "s|^.*SetEnv +VUFIND_ENV.*|SetEnv VUFIND_ENV \"$APPLICATION_ENV\"|g" /etc/apache2/conf-enabled/vufind.conf
+sed -i -E "s|^.*SetEnv +APPLICATION_ENV.*|SetEnv APPLICATION_ENV \"$APPLICATION_ENV\"|g" /etc/apache2/conf-enabled/vufind.conf
 
 ### Run Apache
 echo "Starting Apache..."

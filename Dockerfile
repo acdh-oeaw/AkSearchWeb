@@ -15,6 +15,7 @@ RUN apt update &&\
     ### Apache \
     a2enmod rewrite &&\
     ln -s /usr/local/vufind/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
+    sed -i '/^<\/Location>/i #SetEnv APPLICATION_ENV ""' /etc/apache2/conf-enabled/vufind.conf &&\
     # environment variables are set by the start.sh script (which allows setting them by `docker run`) \
     sed -i -e 's/ SetEnv/ #SetEnv/g' /etc/apache2/conf-enabled/vufind.conf &&\
     # /var/www is www-data user home - ownership allows composer to create cache, etc. \
