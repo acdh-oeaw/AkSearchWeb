@@ -20,9 +20,9 @@ if [ "$ALMA_KEY" == "" ]; then
     echo "ALMA_KEY environment variable not set"
     exit 1
 fi
-sed -i -E "s|^key *=.*|key = $ALMA_KEY|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
+sed -i -E "s|^apiKey *=.*|apiKey = $ALMA_KEY|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
 if [ "$ALMA_URL" != "" ]; then
-    sed -i -E "s|^url *=.*|url = $ALMA_URL|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
+    sed -i -E "s|^apiBaseUrl *=.*|apiBaseUrl = $ALMA_URL|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
 fi
 
 ### Database-related stuff
