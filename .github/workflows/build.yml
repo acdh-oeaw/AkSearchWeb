@@ -11,5 +11,5 @@ jobs:
       run: docker build -t acdhch/aksearchweb:latest .
     - name: docker push
       run: |
-        echo docker "${{ secrets.DOCKERHUBTOKEN }}" | sudo login -u zozlak --password-stdin
+        echo docker "${{ secrets.DOCKERHUBTOKEN }}" | sudo docker login -u zozlak --password-stdin
         sudo docker push acdhch/aksearch-web
