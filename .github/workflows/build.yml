@@ -11,7 +11,7 @@ jobs:
       run: docker build -t acdhch/aksearchweb:latest .
     - uses: docker/login-action@v1
       with:
-        user: zozlak
+        username: zozlak
         password: ${{ secrets.DOCKERHUBTOKEN }}
     - name: docker push
       run: sudo docker push acdhch/aksearch-web
