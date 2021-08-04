@@ -5,6 +5,7 @@ services:
     volumes:
     - ak-solrlogs:/opt/solr/server/logs
     - ak-solrdata:/opt/solr/server/solr
+    - ak-harvest:/opt/harvest
     networks:
     - backend
   ak-mysql:
@@ -27,6 +28,8 @@ services:
     - APPLICATION_ENV=testing
     ports:
     - "80:80"
+    volumes:
+    - ak-harvest:/var/www/local/harvest/alma
     networks:
     - backend
     - bridge
@@ -40,4 +43,5 @@ volumes:
   ak-solrlogs:
   ak-solrdata:
   ak-mysql:
+  ak-harvest:
    
