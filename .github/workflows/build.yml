@@ -14,4 +14,4 @@ jobs:
         username: zozlak
         password: ${{ secrets.DOCKERHUBTOKEN }}
     - name: docker push
-      run: sudo docker push acdhch/aksearch-web
+      run: docker push acdhch/aksearch-web
