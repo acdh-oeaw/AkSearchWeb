@@ -2,8 +2,6 @@ version: "2"
 services:
   ak-solr:
     image: acdhch/aksearch-solr
-    environment:
-    - JAVA_OPTS="-XX:+UseConcMarkSweepGC -XX:MaxHeapFreeRatio=20 -XX:MinHeapFreeRatio=10 -XX:GCTimeRatio=20"
     volumes:
     - ak-solrlogs:/opt/solr/server/logs
     - ak-solrdata:/opt/solr/server/solr
