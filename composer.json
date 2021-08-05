@@ -1,7 +1,6 @@
 {
     "require": {
-        "acdh-oeaw/ak-search-acdh-theme": "*",
-        "laminas/laminas-captcha": "*"
+        "acdh-oeaw/ak-search-acdh-theme": "*"
     },
     "scripts": {
         "post-install-cmd": "",
