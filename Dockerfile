@@ -24,6 +24,8 @@ RUN apt update &&\
     ln -s /usr/local/vufind /var/www/vufind 
 # VuFind/AkSearch will include it automatically
 COPY composer.json /usr/local/vufind/composer.local.json
+# a wrapper assuring only one copy runs at once
+COPY harvest_oai.sh /var/www/vufind/harvest/harvest_oai.sh
 ### AkSearch config tuning which can be done as a www-data user
 USER www-data
 RUN cd /usr/local/vufind &&\ 

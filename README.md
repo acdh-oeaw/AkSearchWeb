@@ -15,6 +15,10 @@ You must pass information about location of Solr and MySQL/MariaDb database usin
 
 Deployment on Portainer is done automatically (there is a service checking for new versions of docker images on docker hub and redeploying services when a new version is available).
 
+### Harvesting with OAI-PMH
+
+Run 
+
 ## Local deployment
 
 Use `docker run`, e.g. (just adjust environment variable values!) :
