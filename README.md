@@ -17,7 +17,7 @@ Deployment on Portainer is done automatically (there is a service checking for n
 
 ### Harvesting with OAI-PMH
 
-Run 
+Run `/var/www/vufind/harvest/harvest_oai.sh` inside the container (e.g. with `docker run {containerName} /var/www/vufind/harvest/harvest_oai.sh`).
 
 ## Local deployment
 
