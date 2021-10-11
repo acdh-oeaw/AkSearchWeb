@@ -35,6 +35,7 @@ If connections with Solr and MySQL/MariaDb database works fine, you should be ab
 |----------------------|----------|---------|------------------------------------------------------------------------|
 | SOLR_URL             |    +     |         | URL of the Solr backend, e.g. http://my.server:8983/solr               |
 | ALMA_KEY             |    +     |         | Your Alma API authorization token                                      |
+| ALMA_URL             |    +     | https://api-eu.hosted.exlibrisgroup.com/almaws/v1 | Base URL of the Alma API     |
 | DB_HOST              |    +     |         | Server name/IP of your MySQL/MariaDb database                          |
 | DB_PSWD              |    +     |         | Password for your MySQL/MariaDb database                               |
 | DB_USER              |          | vufind  | User name for accessing your MySQL/MariaDb database                    |
