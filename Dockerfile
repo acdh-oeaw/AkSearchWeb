@@ -31,10 +31,10 @@ USER www-data
 RUN cd /usr/local/vufind &&\ 
     # remove autoinstallation code - solr is in a separate container and we don't need swaggerui \
     sed -i -e 's/^.*phing-install-dependencies.*$//g' -e 's/"phing installsolr installswaggerui",/"phing installsolr installswaggerui"/g' composer.json &&\
-    # for composer v2 compatibility
-    composer require --no-install wikimedia/composer-merge-plugin:^2 &&\
-    composer update -o &&\
-    # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before)
+    # for composer v2 compatibility \
+    sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json &&\
+    composer update &&\
+    # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before) \
     composer update &&\
     mkdir /var/www/cache
 USER root
