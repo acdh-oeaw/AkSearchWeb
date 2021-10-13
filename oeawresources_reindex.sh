@@ -56,15 +56,11 @@ CONTAINERS=`curl -s -S -H "Authorization: Bearer $TOKEN" "$APIURL/endpoints/1/do
 WEB_CONTAINER=`echo -e "$CONTAINERS" | grep web`
 SOLR_CONTAINER=`echo -e "$CONTAINERS" | grep solr`
 
-echo "## Reharvesting OAI-PMH records"
-docker exec "$WEB_CONTAINER" /var/www/vufind/harvest/harvest_oai.sh
-if [ "$?" != "0" ] ; then
-    exit 2
-fi
-
-echo "## Reingesting data into Solr"
-docker exec -u root "$SOLR_CONTAINER" /opt/aksearch/harvest/batch-import-marc-single.sh -d /opt/harvest
-if [ "$?" != "0" ] ; then
-    exit 3
-fi
-
+echo "## Data removed successfully"
+echo ""
+echo "To harvest OAI-PMH records run the following command in the web application docker container ($WEB_CONTAINER):"
+echo "    /var/www/vufind/harvest/harvest_oai.sh"
+echo ""
+echo "To import harvested records once harvesting ended run the following command AS ROOT in the solr docker container ($SOLR_CONTAINER):"
+echo "    /opt/aksearch/harvest/batch-import-marc-single.sh -d /opt/harvest"
+echo ""
