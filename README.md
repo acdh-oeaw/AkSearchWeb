@@ -19,6 +19,10 @@ Deployment on Portainer is done automatically (there is a service checking for n
 
 Run `/var/www/vufind/harvest/harvest_oai.sh` inside the container (e.g. with `docker exec {containerName} /var/www/vufind/harvest/harvest_oai.sh`).
 
+### Reingesting all data
+
+Run the `oeawresources_reindex.sh` script (provided in this repository main directory) in the bash console.
+
 ## Local deployment
 
 Use `docker run`, e.g. (just adjust environment variable values!) :
