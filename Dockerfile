@@ -8,7 +8,7 @@ RUN apt update &&\
     ### PHP config \
     chmod +x /usr/local/bin/install-php-extensions &&\
     sync &&\
-    install-php-extensions gd intl ldap mysqli soap zip @composer-1 &&\
+    install-php-extensions gd intl ldap mysqli soap zip @composer-2 &&\
     cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" &&\
     ### AkSearch - hopefully composer in the future \
     git clone --depth 1 --recurse-submodules https://biapps.arbeiterkammer.at/gitlab/open/aksearch/aksearch.git /usr/local/vufind &&\
@@ -31,10 +31,12 @@ USER www-data
 RUN cd /usr/local/vufind &&\ 
     # remove autoinstallation code - solr is in a separate container and we don't need swaggerui \
     sed -i -e 's/^.*phing-install-dependencies.*$//g' -e 's/"phing installsolr installswaggerui",/"phing installsolr installswaggerui"/g' composer.json &&\
+    # for composer v2 compatibility \
+    sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json &&\
     composer update &&\
-    # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before)
+    # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before) \
     composer update &&\
     mkdir /var/www/cache
 USER root
 CMD ["/var/www/start.sh"]
-ENV VUFIND_HOME=/usr/local/vufind VUFIND_LOCAL_DIR=/var/www/local VUFIND_CACHE_DIR=/var/www/cache VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch
+ENV VUFIND_HOME=/usr/local/vufind VUFIND_LOCAL_DIR=/var/www/local VUFIND_CACHE_DIR=/var/www/cache VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
