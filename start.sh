@@ -20,9 +20,9 @@ if [ "$ALMA_KEY" == "" ]; then
     echo "ALMA_KEY environment variable not set"
     exit 1
 fi
-sed -i -E "s|^key *=.*|key = $ALMA_KEY|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
+sed -i -E "s|^apiKey *=.*|apiKey = $ALMA_KEY|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
 if [ "$ALMA_URL" != "" ]; then
-    sed -i -E "s|^url *=.*|url = $ALMA_URL|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
+    sed -i -E "s|^apiBaseUrl *=.*|apiBaseUrl = $ALMA_URL|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
 fi
 
 ### Database-related stuff
@@ -60,7 +60,11 @@ if [ "$dbok" == "" ]; then
     mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "DROP USER IF EXISTS '$DB_USER'@'%'" &&\
     mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PSWD'" &&\
     mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%' WITH GRANT OPTION" &&\
-    mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "FLUSH PRIVILEGES" &&\
+    mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "FLUSH PRIVILEGES"
+fi
+dbempty=`mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -D "$DB_NAME" -e "show tables;" | wc -l`
+if [ "$dbempty" == "0" ]; then
+    echo "Database is empty - filling in with $VUFIND_HOME/module/VuFind/sql/mysql.sql"
     mysql -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -D "$DB_NAME" < $VUFIND_HOME/module/VuFind/sql/mysql.sql
 fi
 

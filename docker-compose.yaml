@@ -2,11 +2,10 @@ version: "2"
 services:
   ak-solr:
     image: acdhch/aksearch-solr
-    environment:
-    - JAVA_OPTS="-XX:+UseConcMarkSweepGC -XX:MaxHeapFreeRatio=20 -XX:MinHeapFreeRatio=10 -XX:GCTimeRatio=20"
     volumes:
     - ak-solrlogs:/opt/solr/server/logs
     - ak-solrdata:/opt/solr/server/solr
+    - ak-harvest:/opt/harvest
     networks:
     - backend
   ak-mysql:
@@ -29,6 +28,8 @@ services:
     - APPLICATION_ENV=testing
     ports:
     - "80:80"
+    volumes:
+    - ak-harvest:/var/www/local/harvest/alma
     networks:
     - backend
     - bridge
@@ -42,4 +43,5 @@ volumes:
   ak-solrlogs:
   ak-solrdata:
   ak-mysql:
+  ak-harvest:
    

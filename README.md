@@ -15,6 +15,14 @@ You must pass information about location of Solr and MySQL/MariaDb database usin
 
 Deployment on Portainer is done automatically (there is a service checking for new versions of docker images on docker hub and redeploying services when a new version is available).
 
+### Harvesting with OAI-PMH
+
+Run `/var/www/vufind/harvest/harvest_oai.sh` inside the container (e.g. with `docker exec {containerName} /var/www/vufind/harvest/harvest_oai.sh`).
+
+### Reingesting all data
+
+Run the `oeawresources_reindex.sh` script (provided in this repository main directory) in the bash console.
+
 ## Local deployment
 
 Use `docker run`, e.g. (just adjust environment variable values!) :
@@ -31,13 +39,14 @@ If connections with Solr and MySQL/MariaDb database works fine, you should be ab
 |----------------------|----------|---------|------------------------------------------------------------------------|
 | SOLR_URL             |    +     |         | URL of the Solr backend, e.g. http://my.server:8983/solr               |
 | ALMA_KEY             |    +     |         | Your Alma API authorization token                                      |
+| ALMA_URL             |    +     | https://api-eu.hosted.exlibrisgroup.com/almaws/v1 | Base URL of the Alma API     |
 | DB_HOST              |    +     |         | Server name/IP of your MySQL/MariaDb database                          |
 | DB_PSWD              |    +     |         | Password for your MySQL/MariaDb database                               |
 | DB_USER              |          | vufind  | User name for accessing your MySQL/MariaDb database                    |
 | DB_NAME              |          | vufind  | Your MySQL/MariaDb database name                                       |
 | DB_ROOT              |   +/-    | root    | Name of your MySQL/MariaDb database superuser account (see below)      |
 | DB_ROOT_PSWD         |   +/-    |         | Password for your MySQL/MariaDb database superuser account (see below) |
-| VUFIND_LOCAL_MODULES |          | AkSearch,AkSearchApi, AkSearchConsole,AkSearchSearch | Coma separarated list of Zend2 modules to be enabled (on top of VuFind ones) |
+| VUFIND_LOCAL_MODULES |          | AkSearch,AkSearchApi, AkSearchConsole,AkSearchSearch,aksearchExt | Coma separarated list of Zend2 modules to be enabled (on top of VuFind ones) |
 | APPLICATION_ENV      |          |         | Set to 'development' to avoid Zend configuration caching (which may cause troubles with live development) and enable verbose error messages (this value is also copied VUFIND_ENV) |
 
 #### DB_ROOT_PSWD and DB_ROOT
