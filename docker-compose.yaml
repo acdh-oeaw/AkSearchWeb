@@ -6,8 +6,8 @@ services:
     - ak-solrlogs:/opt/solr/server/logs
     - ak-solrdata:/opt/solr/server/solr
     - ak-harvest:/opt/harvest
-    - /Users/mamo/ACDH-CH/VuFind/AkSearchSolr/local/import:/opt/local/import
-    - /Users/mamo/ACDH-CH/VuFind/AkSearchSolr/sample:/tmp/sample
+    - ../AkSearchSolr/local/import:/opt/local/import
+    - ../AkSearchSolr/sample:/tmp/sample
     ports:
     - "8983:8983"
     networks:
@@ -34,7 +34,7 @@ services:
     - "80:80"
     volumes:
     - ak-harvest:/var/www/local/harvest/alma
-    - /Users/mamo/ACDH-CH/VuFind/AkSearchWeb/local:/var/www/local
+    - ./local:/var/www/local
     networks:
     - backend
     - bridge
