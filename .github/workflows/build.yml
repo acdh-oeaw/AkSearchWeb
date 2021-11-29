@@ -1,6 +1,7 @@
-name: phpunit
-
-on: push
+name: build and publish docker image
+on:
+  push:
+    branches: [main]
 
 jobs:
   dockerhub:
