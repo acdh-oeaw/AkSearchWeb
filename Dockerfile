@@ -8,7 +8,7 @@ RUN apt update &&\
     ### PHP config \
     chmod +x /usr/local/bin/install-php-extensions &&\
     sync &&\
-    install-php-extensions gd intl ldap mysqli soap zip @composer-2 &&\
+    install-php-extensions gd intl ldap mysqli soap xml xsl zip @composer-2 &&\
     cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" &&\
     ### AkSearch - hopefully composer in the future \
     git clone --depth 1 --recurse-submodules https://biapps.arbeiterkammer.at/gitlab/open/aksearch/aksearch.git /usr/local/vufind &&\
