@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: docker build
-      run: docker build -t acdhch/aksearch-web .
+      run: docker build -t acdhch/aksearch-web --label "buildUrl=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" .
     - uses: docker/login-action@v1
       with:
         username: zozlak
