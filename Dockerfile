@@ -4,7 +4,8 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 COPY local /var/www/local
 COPY start.sh /var/www/start.sh
 RUN apt update &&\
-    apt install -y git zip mariadb-client &&\
+    apt install -y git zip mariadb-client vim &&\
+    echo 'syntax on\nfiletype plugin indent on\nset tabstop=4\nset shiftwidth=4\nset expandtab' > /root/.vimrc &&\
     ### PHP config \
     chmod +x /usr/local/bin/install-php-extensions &&\
     sync &&\
@@ -35,8 +36,9 @@ RUN cd /usr/local/vufind &&\
     sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json &&\
     composer update &&\
     # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before) \
-    composer update &&\
+    composer update -o &&\
     mkdir /var/www/cache
 USER root
+WORKDIR /usr/local/vufind
 CMD ["/var/www/start.sh"]
 ENV VUFIND_HOME=/usr/local/vufind VUFIND_LOCAL_DIR=/var/www/local VUFIND_CACHE_DIR=/var/www/cache VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
