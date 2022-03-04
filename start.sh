@@ -88,6 +88,7 @@ fi
 
 ##copy the theme
 cp -rf $VUFIND_HOME/vendor/acdh-oeaw/ak-search-acdh-theme/* $VUFIND_HOME/themes/AcdhchTheme/
+chown www-data -R $VUFIND_HOME/themes/AcdhchTheme/
 
 ### Apache
 sed -i -E "s|^.*SetEnv +VUFIND_LOCAL_DIR.*|SetEnv VUFIND_LOCAL_DIR \"$VUFIND_LOCAL_DIR\"|g" /etc/apache2/conf-enabled/vufind.conf
