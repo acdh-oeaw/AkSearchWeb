@@ -37,6 +37,8 @@ RUN cd /usr/local/vufind &&\
     composer update &&\
     # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before) \
     composer update -o &&\
+    # overwrite LuceneSyntaxHelper class (https://redmine.acdh.oeaw.ac.at/issues/20174)
+    cp vendor/acdh-oeaw/aksearch-ext/override/LuceneSyntaxHelper.php module/VuFindSearch/src/VuFindSearch/Backend/Solr/LuceneSyntaxHelper.php &&\
     mkdir /var/www/cache
 USER root
 WORKDIR /usr/local/vufind
