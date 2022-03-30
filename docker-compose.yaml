@@ -29,7 +29,7 @@ services:
     ports:
     - "80:80"
     volumes:
-    - ak-harvest:/var/www/local/harvest/alma
+    - ak-harvest:/var/www/local/harvest
     networks:
     - backend
     - bridge
