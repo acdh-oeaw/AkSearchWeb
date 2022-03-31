@@ -25,7 +25,7 @@ Run the `oeawresources_reindex.sh` script (provided in this repository main dire
 
 ### Harvesting the DeGruyter data
 
-* Run `cp /var/www/local/config/harvest_degruyter.json.sample /var/www/local/harvest` inside the container.
+* Run `cp /var/www/local/config/harvest_degruyter.json.sample /var/www/local/harvest/harvest_degruyter.json` inside the container.
 * Make sure `/var/www/local/harvest/harvest_degruyter.json` config settings match your needs:
   * check `updateDate` (set to `null` to get all the data)
   * check `targetDir` (remember it should be also accessible from the solr container)
