@@ -25,11 +25,13 @@ Run the `oeawresources_reindex.sh` script (provided in this repository main dire
 
 ### Harvesting the DeGruyter data
 
-* Make sure `/var/www/local/config/harvest_degruyter.json` (inside the container) fits your needs:
+* Run `cp /var/www/local/config/harvest_degruyter.json.sample /var/www/local/harvest` inside the container.
+* Make sure `/var/www/local/harvest/harvest_degruyter.json` config settings match your needs:
   * check `updateDate` (set to `null` to get all the data)
   * check `targetDir` (remember it should be also accessible from the solr container)
   * optionally check `server`, `login`, `ftpPattern` and `recordsPerFile`
-* Run `/var/www/vufind/harvest/harvest_degruyter.sh /var/www/local/config/harvest_degruyter.json ftpPassword` inside the container.
+  * other settings shouldn't require adjustment
+* Run `/var/www/vufind/harvest/harvest_degruyter.sh /var/www/local/harvest/harvest_degruyter.json ftpPassword` inside the container.
   * Repeat periodically. Until you use the same config file, it will automatically take track of what was already processed.
 
 ## Local deployment
