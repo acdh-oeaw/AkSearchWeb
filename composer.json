@@ -1,6 +1,6 @@
 {
     "require": {
-        "acdh-oeaw/ak-search-acdh-theme": "2.8.3",
+        "acdh-oeaw/ak-search-acdh-theme": "2.8.4",
         "acdh-oeaw/aksearch-ext": "^1.9.1"
     },
     "scripts": {
