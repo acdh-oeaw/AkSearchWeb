@@ -1,5 +1,4 @@
 {
-    "lastUpdate": null,
     "server": "ftp.degruyter.de",
     "login": "DGMetadata",
     "ftpPattern": "\/^DG_EBA_EBKALL_XML_([0-9]{4}-[0-9]{2}-[0-9]{2}).zip\/",

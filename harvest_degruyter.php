@@ -34,9 +34,15 @@ if (count($argv) < 3) {
     exit(1);
 }
 $cfg = json_decode(file_get_contents($argv[1]));
-$missingCfg = array_diff(["lastUpdate", "server", "login", "ftpPattern", "datePattern", "targetDir", "recordsPerFile", "xmlRecord", "xmlCollection"], array_keys((array) $cfg));
+$missingCfg = array_diff(["server", "login", "ftpPattern", "datePattern", "targetDir", "recordsPerFile", "xmlRecord", "xmlCollection"], array_keys((array) $cfg));
 if (count($missingCfg) > 0) {
     die("Config files missed configuration properties: " . implode(', ', $missingCfg) . "\n");
+}
+$lastUpdateFile = "$cfg->targetDir/lastDate";
+if (file_exists($lastUpdateFile)) {
+    $lastUpdate = trim(file_get_contents());
+} else {
+    $lastUpdate = null;
 }
 
 $ftp = ftp_connect($cfg->server, 21) ?: die("Ftp connection failed\n");
@@ -47,13 +53,13 @@ ftp_pasv($ftp, true) ?: die("Failed to switch connection into passive mode\n");
 $files = ftp_nlist($ftp, '.') ?: die('Failed listing files');
 $files = array_filter($files, fn($i) => preg_match($cfg->ftpPattern, $i));
 sort($files);
-if ($cfg->lastUpdate === null) {
+if ($lastUpdate === null) {
     $files = [array_pop($files)];
 } else {
-    $files = array_filter($files, fn($i) => preg_replace($cfg->ftpPattern, '$1', $i) > $cfg->lastUpdate);
+    $files = array_filter($files, fn($i) => preg_replace($cfg->ftpPattern, '$1', $i) > $lastUpdate);
 }
 if (count($files) === 0) {
-    die("No new data (last processed date $cfg->lastUpdate)\n");
+    die("No new data (last processed date $lastUpdate)\n");
 }
 
 // process files
@@ -75,7 +81,7 @@ foreach ($files as $file) {
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $zipfile = $zip->getNameIndex($i);
         $update = strpos($zipfile, '_UPDATE_') !== false;
-        if ($cfg->lastUpdate === null && !$update || $cfg->lastUpdate !== null && $update) {
+        if ($lastUpdate === null && !$update || $lastUpdate !== null && $update) {
             $zipfiles[] = $zipfile;
         }
     }
@@ -123,8 +129,7 @@ foreach ($files as $file) {
     fclose($ifh);
     fwrite($ofh, "$xmlCollectionEnd\n");
     fclose($ofh);
-    $cfg->lastUpdate = $date;
-    file_put_contents($argv[1], json_encode($cfg, JSON_PRETTY_PRINT));
+    file_put_contents($lastUpdateFile, $date);
 }
 ftp_close($ftp);
 
