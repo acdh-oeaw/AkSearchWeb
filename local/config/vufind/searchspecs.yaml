@@ -275,6 +275,7 @@ AllFields:
     - contents^10
     - topic_unstemmed^550
     - topic^500
+    - basiskl_txtF_mv^500
     - geographic^300
     - genre^300
     - allfields_unstemmed^10
