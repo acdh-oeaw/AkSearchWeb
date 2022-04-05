@@ -40,7 +40,7 @@ if (count($missingCfg) > 0) {
 }
 $lastUpdateFile = "$cfg->targetDir/lastDate";
 if (file_exists($lastUpdateFile)) {
-    $lastUpdate = trim(file_get_contents());
+    $lastUpdate = trim(file_get_contents($lastUpdateFile));
 } else {
     $lastUpdate = null;
 }
