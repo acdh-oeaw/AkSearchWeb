@@ -1,7 +1,7 @@
 {
     "require": {
-        "acdh-oeaw/ak-search-acdh-theme": "2.8.7",
-        "acdh-oeaw/aksearch-ext": "^1.10.1"
+        "acdh-oeaw/ak-search-acdh-theme": "2.9.0",
+        "acdh-oeaw/aksearch-ext": "^1.11.0"
     },
     "scripts": {
         "post-install-cmd": "",
