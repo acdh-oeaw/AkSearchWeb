@@ -171,4 +171,3 @@ Let's say you want to mount the `d:/my/host/dir` under `/container/dir` in a Doc
   ```
 
 **Be aware** that mounting data from host into a Docker container may cause file permissions issues. The user account used for running the code inside the Docker container may have unsufficient priviledges to access (less likely) or create/modify (very likely) data you mounted from host. There are three workarounds. First, granting everyone read/write rights on the data you are mounting (you should grant them in the host system). Second, use the root account inside the Docker container. Third, synchronize UIDs of the host and Docker container user accounts (but if you are reading this sentence, you should stick to the first or second workaround).
-
