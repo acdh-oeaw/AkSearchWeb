@@ -34,6 +34,7 @@ if [ "$DB_HOST" == "" ]; then
     echo "DB_HOST environment variable not set"
     exit 1
 fi
+DB_ROOT_PSWD=${DB_ROOT_PSWD:=__nopswd__}
 DB_USER=${DB_USER:=vufind}
 DB_NAME=${DB_NAME:=vufind}
 DB_ROOT=${DB_ROOT:=root}
@@ -62,7 +63,7 @@ if [ "$dbok" == "" ]; then
     mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%' WITH GRANT OPTION" &&\
     mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "FLUSH PRIVILEGES"
 fi
-dbempty=`mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -D "$DB_NAME" -e "show tables;" | wc -l`
+dbempty=`mysql -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -D "$DB_NAME" -e "show tables;" | wc -l`
 if [ "$dbempty" == "0" ]; then
     echo "Database is empty - filling in with $VUFIND_HOME/module/VuFind/sql/mysql.sql"
     mysql -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -D "$DB_NAME" < $VUFIND_HOME/module/VuFind/sql/mysql.sql
