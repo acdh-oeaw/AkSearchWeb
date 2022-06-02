@@ -30,6 +30,7 @@ COPY harvest_degruyter.php /var/www/vufind/harvest/harvest_degruyter.php
 # wrappers assuring only one copy runs at once
 COPY harvest_oai.sh /var/www/vufind/harvest/harvest_oai.sh
 COPY harvest_degruyter.sh /var/www/vufind/harvest/harvest_degruyter.sh
+COPY health_check_and_harvest.sh /var/www/vufind/harvest/health_check_and_harvest.sh
 ### AkSearch config tuning which can be done as a www-data user
 USER www-data
 RUN cd /usr/local/vufind &&\ 
