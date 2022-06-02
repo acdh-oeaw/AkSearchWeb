@@ -11,7 +11,7 @@ fi
 HARVEST_PERIOD=1440
 if [ "`find /var/www/local/harvest -maxdepth 1 -mmin -$HARVEST_PERIOD -name harvest_degruyter.json`" == "" ] ; then
     touch /var/www/local/harvest/harvest_degruyter.json
-    /var/www/vufind/harvest/harvest_degruyter.sh
+    /var/www/vufind/harvest/harvest_degruyter.sh /var/www/local/harvest/harvest_degruyter.json $DEGRUYTER_PSWD
 fi
 
 exit $RET
