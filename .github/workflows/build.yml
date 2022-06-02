@@ -23,3 +23,11 @@ jobs:
         password: ${{ secrets.DOCKERHUBTOKEN }}
     - name: docker push
       run: docker push acdhch/aksearch-web:$TAG
+    - name: redeploy
+      run: |
+        NMSP=oeaw-resources-dev
+        if [ "$TAG" == "main"] ; then
+          NMSP=oeaw-resources
+        fi
+        curl -X POST -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" "https://rancher.acdh-dev.oeaw.ac.at/p/c-zdbh8:p-dw4vh/workload/deployment:$NMSP:web?action=redeploy"
+
