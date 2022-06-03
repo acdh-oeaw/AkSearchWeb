@@ -26,7 +26,7 @@ jobs:
     - name: redeploy
       run: |
         NMSP=oeaw-resources-dev
-        if [ "$TAG" == "main"] ; then
+        if [ "$TAG" == "latest"] ; then
           NMSP=oeaw-resources
         fi
         curl -i -X POST -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" "https://rancher.acdh-dev.oeaw.ac.at/v3/project/c-zdbh8:p-dw4vh/workload/deployment:$NMSP:web?action=redeploy"
