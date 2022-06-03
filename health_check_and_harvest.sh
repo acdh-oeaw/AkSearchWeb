@@ -21,8 +21,8 @@ else
     HARVEST_PERIOD=1440
 fi
 chown $SOLR_USER /var/www/local/harvest/degruyter
-if [ "`find /var/www/local/harvest -maxdepth 1 -name harvest_degruyter.json -mmin -$HARVEST_PERIOD`" == "" ] ; then
-    touch /var/www/local/harvest/harvest_degruyter.json
+if [ "`find /var/www/local/harvest/degruyter -maxdepth 1 -name lastDate -mmin -$HARVEST_PERIOD`" == "" ] ; then
+    touch /var/www/local/harvest/degruyter/lastDate
     nohup /var/www/vufind/harvest/harvest_degruyter.sh /var/www/local/harvest/harvest_degruyter.json $DEGRUYTER_PSWD >> /var/www/vufind/harvest/harvest_degruyter.log 2>&1
 fi
 
