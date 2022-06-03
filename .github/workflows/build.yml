@@ -26,6 +26,7 @@ jobs:
     - name: redeploy
       run: |
         NMSP=oeaw-resources-dev
+        echo "%$TAG%"
         if [ "$TAG" == "latest"] ; then
           NMSP=oeaw-resources
         fi
