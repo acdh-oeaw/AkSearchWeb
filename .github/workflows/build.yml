@@ -29,6 +29,7 @@ jobs:
         echo "%$TAG%"
         if [ "$TAG" == "latest"] ; then
           NMSP=oeaw-resources
+          echo "@$NMSP@"
         fi
         echo "https://rancher.acdh-dev.oeaw.ac.at/v3/project/c-zdbh8:p-dw4vh/workload/deployment:$NMSP:web?action=redeploy"
         curl -i -X POST -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" "https://rancher.acdh-dev.oeaw.ac.at/v3/project/c-zdbh8:p-dw4vh/workload/deployment:$NMSP:web?action=redeploy"
