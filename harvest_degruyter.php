@@ -46,7 +46,7 @@ if (file_exists($lastUpdateFile)) {
 }
 $cfg->pswd = $argv[2];
 
-function execFtp($cfg, $command): array | false {
+function execFtp($cfg, $command) {
     $cmd = "$cfg->ftpInit;open $cfg->server;user $cfg->login $cfg->pswd;$command;quit;";
     $cmd = "lftp -e " . escapeshellarg($cmd);
     exec($cmd, $output, $result);
