@@ -58,6 +58,7 @@ If connections with Solr and MySQL/MariaDb database works fine, you should be ab
 | DB_ROOT_PSWD         |   +/-    |         | Password for your MySQL/MariaDb database superuser account (see below) |
 | VUFIND_LOCAL_MODULES |          | AkSearch,AkSearchApi, AkSearchConsole,AkSearchSearch,aksearchExt | Coma separarated list of Zend2 modules to be enabled (on top of VuFind ones) |
 | APPLICATION_ENV      |          |         | Set to 'development' to avoid Zend configuration caching (which may cause troubles with live development) and enable verbose error messages (this value is also copied VUFIND_ENV) |
+| SOLR_USER            |          | 8983    | UID of the solr container user. Used by the OAI-PMH harvesting scripts to assure harvested data can be processed inside the solr container |
 
 #### DB_ROOT_PSWD and DB_ROOT
 
