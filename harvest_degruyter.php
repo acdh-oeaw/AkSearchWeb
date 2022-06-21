@@ -44,13 +44,21 @@ if (file_exists($lastUpdateFile)) {
 } else {
     $lastUpdate = null;
 }
+$cfg->pswd = $argv[2];
 
-$ftp = ftp_connect($cfg->server, 21) ?: die("Ftp connection failed\n");
-ftp_login($ftp, $cfg->login, $argv[2]) ?: die("Loging into ftp server failed\n");
-ftp_pasv($ftp, true) ?: die("Failed to switch connection into passive mode\n");
+function execFtp($cfg, $command) {
+    $cmd = "$cfg->ftpInit;open $cfg->server;user $cfg->login $cfg->pswd;$command;quit;";
+    $cmd = "/usr/bin/lftp -e " . escapeshellarg($cmd);
+    exec($cmd, $output, $result);
+    if ($result !== 0) {
+        echo "ERROR:\n$cmd\n$result\n".implode("\n", $output);
+        return false;
+    }
+    return count($output) === 0 ? ['OK'] : $output;
+}
 
 // list and filter files
-$files = ftp_nlist($ftp, '.') ?: die('Failed listing files');
+$files = execFtp($cfg, "ls -1") ?: die('Failed listing files');
 $files = array_filter($files, fn($i) => preg_match($cfg->ftpPattern, $i));
 sort($files);
 if ($lastUpdate === null) {
@@ -71,7 +79,7 @@ $tmpFile = "$tmpDir/tmpDwnld";
 foreach ($files as $file) {
     // download and extract MARC-XML
     echo "Downloading $file\n";
-    ftp_get($ftp, $tmpFile, $file, FTP_BINARY);
+    execFtp($cfg, "get " . escapeshellarg($file) . " -o " . escapeshellarg($tmpFile)) ?: die("Failed to download $file\n");
     $zip = new ZipArchive();
     $res = $zip->open($tmpFile);
     if ($res !== true) {
@@ -131,5 +139,4 @@ foreach ($files as $file) {
     fclose($ofh);
     file_put_contents($lastUpdateFile, $date);
 }
-ftp_close($ftp);
 
