@@ -48,12 +48,13 @@ $cfg->pswd = $argv[2];
 
 function execFtp($cfg, $command) {
     $cmd = "$cfg->ftpInit;open $cfg->server;user $cfg->login $cfg->pswd;$command;quit;";
-    $cmd = "lftp -e " . escapeshellarg($cmd);
+    $cmd = "/usr/bin/lftp -e " . escapeshellarg($cmd);
     exec($cmd, $output, $result);
     if ($result !== 0) {
+        echo "ERROR:\n$cmd\n$result\n".implode("\n", $output);
         return false;
     }
-    return $output;
+    return count($output) === 0 ? ['OK'] : $output;
 }
 
 // list and filter files
@@ -78,7 +79,7 @@ $tmpFile = "$tmpDir/tmpDwnld";
 foreach ($files as $file) {
     // download and extract MARC-XML
     echo "Downloading $file\n";
-    execFtp($cfg, "get " . escapeshellarg($file) . " -o " . escapeshellarg($tmpFile)) ?: die("Failed to download $file");
+    execFtp($cfg, "get " . escapeshellarg($file) . " -o " . escapeshellarg($tmpFile)) ?: die("Failed to download $file\n");
     $zip = new ZipArchive();
     $res = $zip->open($tmpFile);
     if ($res !== true) {
