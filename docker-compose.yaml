@@ -3,40 +3,42 @@ services:
   ak-solr:
     image: acdhch/aksearch-solr
     volumes:
-    - ak-solrlogs:/opt/solr/server/logs
-    - ak-solrdata:/opt/solr/server/solr
-    - ak-harvest:/opt/harvest/alma
-    - ak-harvest-degruyter:/opt/harvest/degruyter
+      - C:\dev\data\AkSearchWeb\solr-logs:/opt/solr/server/logs
+      - C:\dev\data\AkSearchWeb\solr-cores:/opt/solr/server/solr
+      - C:\dev\AkSearchWeb\local\harvest:/opt/harvest
+      - C:\dev\AkSearchSolr\local\:/opt/local
+    ports:
+      - "8983:8983"
     networks:
-    - backend
+      - backend
+      - bridge
   ak-mysql:
     image: mariadb:10
     environment:
-    - MYSQL_ROOT_PASSWORD=123qwe
+      - MYSQL_ROOT_PASSWORD=123qwe
     volumes:
-    - ak-mysql:/var/lib/mysql
+      - ak-mysql:/var/lib/mysql
     networks:
-    - backend
+      - backend
   ak-web:
     image: acdhch/aksearch-web
     environment:
-    - DB_PSWD=zxcasd
-    - DB_HOST=ak-mysql
-    - DB_ROOT_PSWD=123qwe
-    - SOLR_URL=http://ak-solr:8983/solr
-    - ALMA_KEY=xxx
-    - VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
-    - APPLICATION_ENV=testing
+      - DB_PSWD=zxcasd
+      - DB_HOST=ak-mysql
+      - DB_ROOT_PSWD=123qwe
+      - SOLR_URL=http://ak-solr:8983/solr
+      - ALMA_KEY=l8xxd31454cd4ee64cac8523db95803b211f
+      - VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
+      - APPLICATION_ENV=testing
     ports:
-    - "80:80"
+      - "80:80"
     volumes:
-    - ak-harvest:/var/www/local/harvest/alma
-    - ak-harvest-degruyter:/var/www/local/harvest/degruyter
+      - C:\dev\AkSearchWeb\local\:/var/www/local
     networks:
-    - backend
-    - bridge
+      - backend
+      - bridge
     depends_on:
-    - ak-mysql
+      - ak-mysql
 networks:
   backend:
     driver: bridge
@@ -46,4 +48,4 @@ volumes:
   ak-solrdata:
   ak-mysql:
   ak-harvest:
-  ak-harvest-degruyter:   
+
