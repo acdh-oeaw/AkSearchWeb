@@ -15,7 +15,7 @@ RUN apt update &&\
     git clone --depth 1 --recurse-submodules https://biapps.arbeiterkammer.at/gitlab/open/aksearch/aksearch.git /usr/local/vufind &&\
     ### Apache \
     a2enmod rewrite &&\
-    ln -s /usr/local/vufind/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
+    ln /var/www/local/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
     sed -i '/^<\/Location>/i #SetEnv APPLICATION_ENV ""' /etc/apache2/conf-enabled/vufind.conf &&\
     # environment variables are set by the start.sh script (which allows setting them by `docker run`) \
     sed -i -e 's/ SetEnv/ #SetEnv/g' /etc/apache2/conf-enabled/vufind.conf &&\
@@ -37,10 +37,12 @@ RUN cd /usr/local/vufind &&\
     # remove autoinstallation code - solr is in a separate container and we don't need swaggerui \
     sed -i -e 's/^.*phing-install-dependencies.*$//g' -e 's/"phing installsolr installswaggerui",/"phing installsolr installswaggerui"/g' composer.json &&\
     # for composer v2 compatibility \
-    sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json &&\
+    sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json && \
     composer update &&\
     # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before) \
-    composer update -o &&\
+    composer update -o && \
+    composer require "acdh-oeaw/ak-search-acdh-theme" && \
+    composer require "acdh-oeaw/aksearch-ext" && \
     # overwrite LuceneSyntaxHelper class (https://redmine.acdh.oeaw.ac.at/issues/20174)
     cp vendor/acdh-oeaw/aksearch-ext/override/LuceneSyntaxHelper.php module/VuFindSearch/src/VuFindSearch/Backend/Solr/LuceneSyntaxHelper.php &&\
     mkdir /var/www/cache
