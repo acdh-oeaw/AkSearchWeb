@@ -37,12 +37,14 @@ RUN cd /usr/local/vufind &&\
     # remove autoinstallation code - solr is in a separate container and we don't need swaggerui \
     sed -i -e 's/^.*phing-install-dependencies.*$//g' -e 's/"phing installsolr installswaggerui",/"phing installsolr installswaggerui"/g' composer.json &&\
     # for composer v2 compatibility \
-    sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json &&\
+    sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json && \
     composer update &&\
     # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before) \
-    composer update -o &&\
+    composer update -o && \
+    composer require "acdh-oeaw/ak-search-acdh-theme" && \
+    composer require "acdh-oeaw/aksearch-ext" && \
     # overwrite LuceneSyntaxHelper class (https://redmine.acdh.oeaw.ac.at/issues/20174)
-    # cp vendor/acdh-oeaw/aksearch-ext/override/LuceneSyntaxHelper.php module/VuFindSearch/src/VuFindSearch/Backend/Solr/LuceneSyntaxHelper.php &&\
+    cp vendor/acdh-oeaw/aksearch-ext/override/LuceneSyntaxHelper.php module/VuFindSearch/src/VuFindSearch/Backend/Solr/LuceneSyntaxHelper.php &&\
     mkdir /var/www/cache
 USER root
 WORKDIR /usr/local/vufind
