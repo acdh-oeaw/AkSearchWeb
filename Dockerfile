@@ -34,17 +34,17 @@ COPY health_check_and_harvest.sh /var/www/vufind/harvest/health_check_and_harves
 ### AkSearch config tuning which can be done as a www-data user
 USER www-data
 RUN cd /usr/local/vufind &&\ 
-    # remove autoinstallation code - solr is in a separate container and we don't need swaggerui \
-    sed -i -e 's/^.*phing-install-dependencies.*$//g' -e 's/"phing installsolr installswaggerui",/"phing installsolr installswaggerui"/g' composer.json &&\
+    # remove automatic installation of solr and swaggerui \
+    sed -i -e '/phing-install-dependencies/d' composer.json &&\
     # for composer v2 compatibility \
     composer config allow-plugins true &&\
-    sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json && \
-    composer update &&\
+    sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json &&\
+    composer update -o --no-dev &&\
     # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before) \
-    composer update -o && \
-    composer require "acdh-oeaw/ak-search-acdh-theme" && \
-    composer require "acdh-oeaw/aksearch-ext" && \
-    # overwrite LuceneSyntaxHelper class (https://redmine.acdh.oeaw.ac.at/issues/20174)
+    composer update -o --no-dev &&\
+    # setup swaggerui \
+    vendor/bin/phing installswaggerui &&\
+    # overwrite LuceneSyntaxHelper class (https://redmine.acdh.oeaw.ac.at/issues/20174) \
     cp vendor/acdh-oeaw/aksearch-ext/override/LuceneSyntaxHelper.php module/VuFindSearch/src/VuFindSearch/Backend/Solr/LuceneSyntaxHelper.php &&\
     mkdir /var/www/cache
 USER root
