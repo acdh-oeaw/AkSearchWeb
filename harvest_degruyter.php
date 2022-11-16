@@ -60,6 +60,9 @@ function execFtp($cfg, $command) {
 // list and filter files
 $files = execFtp($cfg, "ls -1") ?: die('Failed listing files');
 $files = array_filter($files, fn($i) => preg_match($cfg->ftpPattern, $i));
+if (count($files) === 0) {
+    die("No files matching the pattern defined in the " . $argv[1]);
+}
 sort($files);
 if ($lastUpdate === null) {
     $files = [array_pop($files)];
