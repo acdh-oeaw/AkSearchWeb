@@ -57,9 +57,65 @@ function execFtp($cfg, $command) {
     return count($output) === 0 ? ['OK'] : $output;
 }
 
+function listDav($cfg) {
+    $response = fopen('php://memory', 'w+');
+    $body = fopen('php://memory', 'w+');
+    fwrite($body, '<?xml version="1.0" encoding="utf-8" ?><propfind xmlns="DAV:"><propname/></propfind>');
+    fseek($body, 0, SEEK_SET);
+    $h = curl_init();
+    curl_setopt_array($h, [
+        CURLOPT_URL => $cfg->server,
+        CURLOPT_USERNAME => $cfg->login,
+        CURLOPT_HTTPHEADER => [
+            'Accept' => 'application/xml',
+            'Depth' => '1',
+            'Content-Type' => 'application/xml'
+        ],
+        CURLOPT_CUSTOMREQUEST => 'PROPFIND',
+        CURLOPT_INFILE => $body,
+        CURLOPT_FILE => $response,
+    ]);
+    curl_exec($h) ?: die(curl_error());
+    curl_close($h);
+    fclose($body);
+    fseek($response, 0, SEEK_SET);
+    $xml = '';
+    while (!feof($response)) {
+        $xml .= fread($response, 1048576);
+    }
+    fclose($response);
+    $xml = new SimpleXMLElement($xml);
+    $xml->registerXPathNamespace('d', 'DAV:');
+    $files = [];
+    foreach ($xml->xpath('//d:response/d:href') as $file) {
+        $files[] = preg_replace('`^.*/`', '', (string) $file);
+    }
+    return $files;
+}
+
+function dwnldDav($cfg, $file, $outFile) {
+    $oh = fopen($outFile, 'w');
+    $h = curl_init();
+    curl_setopt_array($h, [
+        CURLOPT_URL => $cfg->server . '/' . $file,
+        CURLOPT_USERNAME => $cfg->login,
+        CURLOPT_FILE => $oh,
+    ]);
+    curl_exec($h) ?: die(curl_error());
+    curl_close($h);
+    fclose($oh);
+}
+
 // list and filter files
-$files = execFtp($cfg, "ls -1") ?: die('Failed listing files');
+if (substr($cfg->server, 0, 4) === 'http') {
+    $files = listDav($cfg);
+} else {
+    $files = execFtp($cfg, "ls -1") ?: die('Failed listing files');
+}
 $files = array_filter($files, fn($i) => preg_match($cfg->ftpPattern, $i));
+if (count($files) === 0) {
+    die("No matching files found on the FTP server (the pattern is defined in $argv[1])");
+}
 sort($files);
 if ($lastUpdate === null) {
     $files = [array_pop($files)];
@@ -79,7 +135,11 @@ $tmpFile = "$tmpDir/tmpDwnld";
 foreach ($files as $file) {
     // download and extract MARC-XML
     echo "Downloading $file\n";
-    execFtp($cfg, "get " . escapeshellarg($file) . " -o " . escapeshellarg($tmpFile)) ?: die("Failed to download $file\n");
+    if (substr($cfg->server, 0, 4) === 'http') {
+        dwnldDav($cfg, $file, $tmpFile);
+    } else {
+        execFtp($cfg, "get " . escapeshellarg($file) . " -o " . escapeshellarg($tmpFile)) ?: die("Failed to download $file\n");
+    }
     $zip = new ZipArchive();
     $res = $zip->open($tmpFile);
     if ($res !== true) {
