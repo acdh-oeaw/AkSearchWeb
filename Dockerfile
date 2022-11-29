@@ -12,7 +12,7 @@ RUN apt update &&\
     install-php-extensions gd intl ldap mysqli soap xml xsl zip @composer-2 &&\
     cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" &&\
     ### AkSearch - hopefully composer in the future \
-    git clone --depth 1 --recurse-submodules https://github.com/ctot-nondef/AkSearch.git /usr/local/vufind &&\
+    git clone --depth 1 --recurse-submodules https://github.com/acdh-oeaw/aksearch.git /usr/local/vufind &&\
     ### Apache \
     a2enmod rewrite &&\
     ln /var/www/local/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
