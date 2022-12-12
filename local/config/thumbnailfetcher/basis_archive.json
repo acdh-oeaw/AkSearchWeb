@@ -1,7 +1,7 @@
 {
   "basis_archive_photos": {
     "mdsource": {
-      "baseurl": "http://host.docker.internal/resources/api/v1/search?",
+      "baseurl": "https://www.oeaw.ac.at/resources/api/v1/search?",
       "parameters": {
         "field[]": [
           "id",
@@ -32,7 +32,7 @@
   },
   "basis_archive_squeezes": {
     "mdsource": {
-      "baseurl": "http://host.docker.internal/resources/api/v1/search?",
+      "baseurl": "https://www.oeaw.ac.at/resources/api/v1/search?",
       "parameters": {
         "field[]": [
           "id",
