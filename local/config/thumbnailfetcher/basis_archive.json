@@ -28,7 +28,7 @@
         "expectedtype": "image/jpeg"
       }
     ],
-    "target": "/var/www/cache/covers/harvested/basis_archive"
+    "target": "/var/www/cache/covers"
   },
   "basis_archive_squeezes": {
     "mdsource": {
@@ -83,6 +83,6 @@
         "expectedtype": "image/jpeg"
       }
     ],
-    "target": "/var/www/cache/covers/harvested/basis_archive"
+    "target": "/var/www/cache/covers"
   }
 }
