@@ -15,7 +15,7 @@ RUN apt update &&\
     git clone --depth 1 --recurse-submodules https://github.com/acdh-oeaw/aksearch.git /usr/local/vufind &&\
     ### Apache \
     a2enmod rewrite &&\
-    ln /var/www/local/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
+    ln -s /var/www/local/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
     sed -i '/^<\/Location>/i #SetEnv APPLICATION_ENV ""' /etc/apache2/conf-enabled/vufind.conf &&\
     # environment variables are set by the start.sh script (which allows setting them by `docker run`) \
     sed -i -e 's/ SetEnv/ #SetEnv/g' /etc/apache2/conf-enabled/vufind.conf &&\
