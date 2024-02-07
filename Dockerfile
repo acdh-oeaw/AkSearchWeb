@@ -4,7 +4,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 COPY local /var/www/local
 COPY start.sh /var/www/start.sh
 RUN apt update &&\
-    apt install -y git zip mariadb-client vim lftp &&\
+    apt install -y git zip mariadb-client vim lftp libapache2-mod-evasive &&\
     echo 'syntax on\nfiletype plugin indent on\nset tabstop=4\nset shiftwidth=4\nset expandtab' > /root/.vimrc &&\
     ### PHP config \
     chmod +x /usr/local/bin/install-php-extensions &&\
