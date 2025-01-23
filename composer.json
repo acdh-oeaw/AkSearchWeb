@@ -1,7 +1,7 @@
 {
     "require": {
-        "acdh-oeaw/ak-search-acdh-theme": "3.4.1",
-        "acdh-oeaw/aksearch-ext": "2.4.8"
+        "acdh-oeaw/ak-search-acdh-theme": "dev-vufind10",
+        "acdh-oeaw/aksearch-ext": "dev-vufind10"
     },
     "scripts": {
         "post-install-cmd": "",
