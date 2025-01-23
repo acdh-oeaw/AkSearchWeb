@@ -92,7 +92,7 @@ Docker doesn't update images automatically, so every time you want to make sure 
 
 Same goes for other images (in our case `acdhch/aksearch-solr` for the Solr backend and `mariadb:10` for the MariaDb backend).
 
-If you are using `docker-compose`, you can run `docker-compose pull` to update all of them at once.
+If you are using `docker compose`, you can run `docker compose pull` to update all of them at once.
 
 ## Extending
 
@@ -137,7 +137,7 @@ The easiest way to deploy dependencies is to use the `docker-compose.yaml` file 
       The reason for not providing such mappings is the `docker-compose.yaml` is that it makes both services easily accessible which might be not desiread as e.g. Solr has no authorization by default.
 * Open console, go to the directory with the `docker-compose.yaml` and run
   ```bash
-  docker-compose up
+  docker compose up
   ```
     * To shut down containers just hit `CTRL+C` on the console where `docker-compose up` displays containers' logs.
 
