@@ -22,7 +22,7 @@ services:
     image: acdhch/aksearch-web:vufind10
     environment:
     - DB_PSWD=zxcasd
-    - DB_HOST=ak-mysql
+    - DB_HOST=localdeployment-ak-mysql-1
     - DB_ROOT_PSWD=123qwe
     - SOLR_URL=http://localdeployment-ak-solr-1:8983/solr
     - ALMA_KEY=xxx
