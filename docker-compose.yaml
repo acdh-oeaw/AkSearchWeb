@@ -1,15 +1,15 @@
 version: "2"
 services:
-  ak-solr:
+  solr:
     image: acdhch/aksearch-solr
     volumes:
       - ak-solrlogs:/opt/solr/server/logs
       - ak-solrdata:/opt/solr/server/solr
-      - ak-harvest:/opt/harvest/alma
-      - ak-harvest-degruyter:/opt/harvest/degruyter
+      - ak-harvestArchiveOeai:/opt/harvest/archive_oeai
+      - ak-localConfigSolr:/opt/local
     networks:
       - backend
-  ak-mysql:
+  mysql:
     image: mariadb:10
     environment:
       - MYSQL_ROOT_PASSWORD=123qwe
@@ -17,33 +17,78 @@ services:
       - ak-mysql:/var/lib/mysql
     networks:
       - backend
-  ak-web:
+  web:
     image: acdhch/aksearch-web
     environment:
       - DB_PSWD=zxcasd
-      - DB_HOST=ak-mysql
+      - DB_HOST=mysql
       - DB_ROOT_PSWD=123qwe
-      - SOLR_URL=http://ak-solr:8983/solr
-      - ALMA_KEY=xxx
+      - SOLR_URL=http://solr:8983/solr
+      - ALMA_KEY=l8xxfdbfe981e3b648a68afec0639337b351
       - VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
       - APPLICATION_ENV=testing
     ports:
       - "80:80"
     volumes:
-      - ak-harvest:/var/www/local/harvest/alma
-      - ak-harvest-degruyter:/var/www/local/harvest/degruyter
+      - ak-harvestArchiveOeai:/var/www/local/harvest/archive_oeai
+      - ak-localConfigWeb:/var/www/local/config
+      - ak-localAkSearchExt:/usr/local/vufind/vendor/acdh-oeaw/aksearch-ext
+      - ak-harvestConfig:/var/www/local/harvest
     networks:
       - backend
       - bridge
     depends_on:
-      - ak-mysql
+      - mysql
 networks:
   backend:
     driver: bridge
   bridge:
 volumes:
+  ak-localConfigWeb:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/choffmann/devel/AkSearchWeb/local/config
+      o: bind
+  ak-localConfigSolr:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/choffmann/devel/AkSearchSolr/local
+      o: bind
   ak-solrlogs:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/choffmann/devel/data/aksearch/solrlogs
+      o: bind
   ak-solrdata:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/choffmann/devel/data/aksearch/solrdata
+      o: bind
   ak-mysql:
-  ak-harvest:
-  ak-harvest-degruyter:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/choffmann/devel/data/aksearch/mysql
+      o: bind
+  ak-harvestArchiveOeai:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/choffmann/devel/data/aksearch/harvest/archive_oeai
+      o: bind
+  ak-harvestConfig:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/choffmann/devel/AkSearchWeb/local/harvest
+      o: bind
+  ak-localAkSearchExt:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/choffmann/devel/AkSearchExtend
+      o: bind

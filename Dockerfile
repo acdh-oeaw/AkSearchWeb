@@ -4,7 +4,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 COPY local /var/www/local
 COPY start.sh /var/www/start.sh
 RUN apt update &&\
-    apt install -y git zip mariadb-client vim lftp &&\
+    apt install -y git zip mariadb-client vim lftp libapache2-mod-evasive &&\
     echo 'syntax on\nfiletype plugin indent on\nset tabstop=4\nset shiftwidth=4\nset expandtab' > /root/.vimrc &&\
     ### PHP config \
     chmod +x /usr/local/bin/install-php-extensions &&\
@@ -15,7 +15,8 @@ RUN apt update &&\
     git clone --depth 1 --recurse-submodules https://github.com/acdh-oeaw/aksearch.git /usr/local/vufind &&\
     ### Apache \
     a2enmod rewrite &&\
-    ln /var/www/local/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
+    a2enmod remoteip &&\
+    ln -s /var/www/local/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
     sed -i '/^<\/Location>/i #SetEnv APPLICATION_ENV ""' /etc/apache2/conf-enabled/vufind.conf &&\
     # environment variables are set by the start.sh script (which allows setting them by `docker run`) \
     sed -i -e 's/ SetEnv/ #SetEnv/g' /etc/apache2/conf-enabled/vufind.conf &&\
@@ -33,7 +34,7 @@ COPY harvest_degruyter.sh /var/www/vufind/harvest/harvest_degruyter.sh
 COPY health_check_and_harvest.sh /var/www/vufind/harvest/health_check_and_harvest.sh
 ### AkSearch config tuning which can be done as a www-data user
 USER www-data
-RUN cd /usr/local/vufind &&\ 
+RUN cd /usr/local/vufind &&\
     # remove automatic installation of solr and swaggerui \
     sed -i -e '/phing-install-dependencies/d' composer.json &&\
     # for composer v2 compatibility \
