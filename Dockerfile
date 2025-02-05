@@ -27,7 +27,7 @@ RUN a2enmod rewrite &&\
 COPY composer.json /usr/local/vufind/composer.local.json
 # After cloning of the vufind/aksearch repo in /usr/local/vufind/harvest
 COPY harvest/* /usr/local/vufind/harvest/
-### AkSearch config tuning which can be done as a www-data user
+### VuFind config tuning which can be done as a www-data user
 USER www-data
 RUN cd /usr/local/vufind &&\
     # remove automatic installation of solr and swaggerui \
@@ -41,6 +41,10 @@ RUN cd /usr/local/vufind &&\
     # setup swaggerui \
     vendor/bin/phing installswaggerui &&\
     mkdir /var/www/cache
+# AkSearch dirty hacks
+#   Incompatible with PHP 8.4 class inheritance but anyway defined in the parent class
+#   The only other way to fix it would be to copy-paste to aksearch-ext and fix it there which is even more ugly
+RUN sed -i -e '/protected \$results;/d' /usr/local/vufind/module/AkSearch/src/AkSearch/Search/Solr/FacetCache.php
 USER root
 WORKDIR /usr/local/vufind
 CMD ["/var/www/start.sh"]
