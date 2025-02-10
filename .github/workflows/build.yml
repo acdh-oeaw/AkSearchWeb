@@ -1,14 +1,14 @@
 name: build and publish docker image
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, vufind10]
   workflow_dispatch: ~
 
 jobs:
   dockerhub:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: get branch
       run: |
         # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
@@ -26,6 +26,7 @@ jobs:
     - name: redeploy
       run: |
         NMSP=oeaw-resources-dev
+        if [ "$TAG" == "vufind10" ] ; then NMSP=oeaw-resources-vf10 ; fi
         if [ "$TAG" == "latest" ] ; then NMSP=oeaw-resources ; fi
         echo "https://rancher.acdh-dev.oeaw.ac.at/v3/project/c-m-6hwgqq2g:p-nlsz2/workload/deployment:$NMSP:web?action=redeploy"
         curl -i -X POST -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" "https://rancher.acdh-dev.oeaw.ac.at/v3/project/c-m-6hwgqq2g:p-nlsz2/workload/deployment:$NMSP:web?action=redeploy"
