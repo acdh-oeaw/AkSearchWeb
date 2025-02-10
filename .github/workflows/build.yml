@@ -26,7 +26,8 @@ jobs:
     - name: redeploy
       run: |
         NMSP=oeaw-resources-dev
-        if [ "$TAG" == "vufind10" ] ; then NMSP=oeaw-resources-vf10 ; fi
+        # yes, fv10 is a typo but recreating a namespace in rancher is too much work to fix it
+        if [ "$TAG" == "vufind10" ] ; then NMSP=oeaw-resources-fv10 ; fi
         if [ "$TAG" == "latest" ] ; then NMSP=oeaw-resources ; fi
         echo "https://rancher.acdh-dev.oeaw.ac.at/v3/project/c-m-6hwgqq2g:p-nlsz2/workload/deployment:$NMSP:web?action=redeploy"
         curl -i -X POST -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" "https://rancher.acdh-dev.oeaw.ac.at/v3/project/c-m-6hwgqq2g:p-nlsz2/workload/deployment:$NMSP:web?action=redeploy"
