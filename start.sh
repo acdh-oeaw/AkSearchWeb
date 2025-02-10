@@ -73,7 +73,7 @@ if [ ! -e "$VUFIND_LOCAL_DIR/config/vufind/config.ini" ]; then
     mkdir -p "$VUFIND_LOCAL_DIR/config/vufind" &&\
     cp "$VUFIND_HOME/config/vufind/config.ini" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
 fi
-sed -i -e "s|^database *=.*|database = $DB_CONN_STR|g" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
+sed -i -e "s|^database *=.*|database = \"$DB_CONN_STR\"|g" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
 
 ### Update Solr URL in config files
 if [ "$SOLR_URL" == "" ]; then
