@@ -13,16 +13,21 @@ jobs:
       run: |
         # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
         TAG=${GITHUB_REF##*/}
-        if [ "$TAG" == "main" ] ; then TAG=latest ; fi
         echo "TAG=$TAG" >> $GITHUB_ENV
     - name: docker build
-      run: docker build -t acdhch/aksearch-web:$TAG --label "buildUrl=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" .
+      run: |
+        docker build -t acdhch/aksearch-web:$TAG --label "buildUrl=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" .
     - uses: docker/login-action@v1
       with:
         username: zozlak
         password: ${{ secrets.DOCKERHUBTOKEN }}
     - name: docker push
-      run: docker push acdhch/aksearch-web:$TAG
+      run: |
+        docker push acdhch/aksearch-web:$TAG
+        if [ "$TAG" == "main" ] ; then
+            docker tag acdhch/aksearch-web:$TAG acdhch/aksearch-web:latest
+            docker push acdhch/aksearch-web:latest
+        fi
     - name: redeploy
       run: |
         NMSP=oeaw-resources-dev
