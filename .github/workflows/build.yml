@@ -45,6 +45,6 @@ jobs:
         if [ "$TAG" == "main" ] ; then NMSP=oeaw-resources ; fi
 
         curl -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" "https://rancher.acdh-dev.oeaw.ac.at/k8s/clusters/c-m-6hwgqq2g/v1/apps.deployments/$NMSP/$WORKLOAD" > /tmp/workload.json
-        sed -i -E "s/\"image\":\"[^\"]+\"/\"image\":\"acdhch\/$IMAGE:$DATETAG\"/g" /tmp/workload.json
+        sed -i -E "s|\"image\":\"[^\"]+\"|\"image\":\"$IMAGE:$DATETAG\"|g" /tmp/workload.json
         curl -i -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" -X PUT "https://rancher.acdh-dev.oeaw.ac.at/k8s/clusters/c-m-6hwgqq2g/v1/apps.deployments/$NMSP/$WORKLOAD" -H 'Content-Type: application/json' --data-binary @/tmp/workload.json
 
