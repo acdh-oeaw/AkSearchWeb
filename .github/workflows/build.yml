@@ -4,6 +4,9 @@ on:
     branches: [main, dev]
   workflow_dispatch: ~
 
+env:
+  WORKLOAD: web
+
 jobs:
   dockerhub:
     runs-on: ubuntu-latest
@@ -13,20 +16,35 @@ jobs:
       run: |
         # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
         TAG=${GITHUB_REF##*/}
-        if [ "$TAG" == "main" ] ; then TAG=latest ; fi
         echo "TAG=$TAG" >> $GITHUB_ENV
+        echo "DATETAG=`date +%Y%m%d%H%M`" >> $GITHUB_ENV
+        echo "IMAGE=acdhch/aksearch-$WORKLOAD" >> $GITHUB_ENV
     - name: docker build
-      run: docker build -t acdhch/aksearch-web:$TAG --label "buildUrl=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" .
-    - uses: docker/login-action@v1
+      run: |
+        docker build -t $IMAGE:$TAG --label "buildUrl=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" .
+    - uses: docker/login-action@v3
       with:
         username: zozlak
         password: ${{ secrets.DOCKERHUBTOKEN }}
     - name: docker push
-      run: docker push acdhch/aksearch-web:$TAG
+      run: |
+        docker push $IMAGE:$TAG
+
+        docker tag $IMAGE:$TAG $IMAGE:$DATETAG
+        docker push $IMAGE:$DATETAG
+
+        if [ "$TAG" == "main" ] ; then
+            docker tag $IMAGE:$TAG $IMAGE:latest
+            docker push $IMAGE:latest
+        fi
     - name: redeploy
       run: |
         NMSP=oeaw-resources-dev
-        if [ "$TAG" == "latest" ] ; then NMSP=oeaw-resources ; fi
-        echo "https://rancher.acdh-dev.oeaw.ac.at/v3/project/c-m-6hwgqq2g:p-nlsz2/workload/deployment:$NMSP:web?action=redeploy"
-        curl -i -X POST -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" "https://rancher.acdh-dev.oeaw.ac.at/v3/project/c-m-6hwgqq2g:p-nlsz2/workload/deployment:$NMSP:web?action=redeploy"
+        # yes, fv10 is a typo but recreating a namespace in rancher is too much work to fix it
+        if [ "$TAG" == "vufind10" ] ; then NMSP=oeaw-resources-fv10 ; fi
+        if [ "$TAG" == "main" ] ; then NMSP=oeaw-resources ; fi
+
+        curl -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" "https://rancher.acdh-dev.oeaw.ac.at/k8s/clusters/c-m-6hwgqq2g/v1/apps.deployments/$NMSP/$WORKLOAD" > /tmp/workload.json
+        sed -i -E "s|\"image\":\"[^\"]+\"|\"image\":\"$IMAGE:$DATETAG\"|g" /tmp/workload.json
+        curl -i -H "Authorization: Bearer ${{ secrets.RANCHER_TOKEN }}" -X PUT "https://rancher.acdh-dev.oeaw.ac.at/k8s/clusters/c-m-6hwgqq2g/v1/apps.deployments/$NMSP/$WORKLOAD" -H 'Content-Type: application/json' --data-binary @/tmp/workload.json
 
