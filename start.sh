@@ -99,7 +99,12 @@ sed -i -E "s|^.*SetEnv +VUFIND_ENV.*|SetEnv VUFIND_ENV \"$APPLICATION_ENV\"|g" /
 sed -i -E "s|^.*SetEnv +APPLICATION_ENV.*|SetEnv APPLICATION_ENV \"$APPLICATION_ENV\"|g" /etc/apache2/conf-enabled/vufind.conf
 
 echo "Rebuild css...."
-php -f $VUFIND_HOME/util/cssBuilder.php
+
+#php -f $VUFIND_HOME/util/cssBuilder.php - deprecated as of 10.x
+npm install
+npm run build:less
+npm run install:scss-dependencies
+grunt scssonly --force ##force to compile in spite of warnings
 
 ### Run Apache
 echo "Starting Apache...!"
