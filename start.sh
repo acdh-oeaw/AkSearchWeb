@@ -100,6 +100,7 @@ sed -i -E "s|^.*SetEnv +APPLICATION_ENV.*|SetEnv APPLICATION_ENV \"$APPLICATION_
 
 echo "Rebuild css...."
 
+php -f utils/compile-sass.php
 #php -f $VUFIND_HOME/util/cssBuilder.php - deprecated as of 10.x
 npm install
 npm run build:less
