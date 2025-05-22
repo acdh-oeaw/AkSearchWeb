@@ -90,6 +90,9 @@ fi
 ##copy the theme
 cp -rf $VUFIND_HOME/vendor/acdh-oeaw/ak-search-acdh-theme/* $VUFIND_HOME/themes/AcdhchTheme/
 chown www-data -R $VUFIND_HOME/themes/AcdhchTheme/
+cd $VUFIND_HOME/themes/AcdhchTheme/
+php -f utils/compile-sass.php
+cd /usr/local/vufind
 
 ### Apache
 sed -i -E "s|^.*SetEnv +VUFIND_LOCAL_DIR.*|SetEnv VUFIND_LOCAL_DIR \"$VUFIND_LOCAL_DIR\"|g" /etc/apache2/conf-enabled/vufind.conf
@@ -100,7 +103,6 @@ sed -i -E "s|^.*SetEnv +APPLICATION_ENV.*|SetEnv APPLICATION_ENV \"$APPLICATION_
 
 echo "Rebuild css...."
 
-php -f utils/compile-sass.php
 #php -f $VUFIND_HOME/util/cssBuilder.php - deprecated as of 10.x
 npm install
 npm run build:less
