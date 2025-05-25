@@ -101,6 +101,9 @@ sed -i -E "s|^.*SetEnv +APPLICATION_ENV.*|SetEnv APPLICATION_ENV \"$APPLICATION_
 echo "Rebuild css...."
 php -f $VUFIND_HOME/util/cssBuilder.php
 
+### Remove harvesting locks
+rm -f /tmp/*lock
+
 ### Run Apache
 echo "Starting Apache...!"
 apache2-foreground
