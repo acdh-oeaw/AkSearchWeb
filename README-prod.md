@@ -12,18 +12,18 @@ Making things work behind the proxy
   ```
   mkdir /etc/systemd/system/docker.service.d
   cat > /etc/systemd/system/docker.service.d/http-proxy.conf <<EOL
-[Service]
-Environment="HTTP_PROXY=http://fifi.arz.oeaw.ac.at:8080/"
-Environment="HTTPS_PROXY=http://fifi.arz.oeaw.ac.at:8080/"
-Environment="NO_PROXY=127.0.0.1,localhost,10.3.6.33"
-EOL
+  [Service]
+  Environment="HTTP_PROXY=http://fifi.arz.oeaw.ac.at:8080/"
+  Environment="HTTPS_PROXY=http://fifi.arz.oeaw.ac.at:8080/"
+  Environment="NO_PROXY=127.0.0.1,localhost,10.3.6.33"
+  EOL
   systemctl daemon-reload
   systemctl restart docker
   ```
 
 ## Deployment
 
-A custom systemd service using docker-compose with the docker-compose.yaml in '/opt/prod`.
+A custom systemd service using docker-compose with the [docker-compose.yaml](https://github.com/acdh-oeaw/AkSearchWeb/blob/main/docker-compose-prod.yaml) in '/opt/prod`.
 
 ```
 cat > /etc/systemd/system/oeaw_resources_prod.service <<EOL
@@ -68,7 +68,7 @@ Harvesting and indexing cron jobs set up on root user account.
 30 0 1 * * docker exec prod_solr_1 /bin/sh -c 'flock -n /tmp/index_degruyter.lock     -c "cd /opt/aksearch && harvest/batch-import-marc.sh -d -p /opt/local/import/import_bib_degruyter.properties /opt/harvest/bib_degruyter"' > /opt/prod/log/index_bib-degruyter.log 2>&1
 ```
 
-Redeployment script:
+#### Redeployment script:
 
 ```
 cat > /opt/prod/pull_redeploy.sh <<EOL
