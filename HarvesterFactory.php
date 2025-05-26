@@ -86,7 +86,6 @@ class HarvesterFactory
             $options['proxy_host'] = parse_url($proxy, PHP_URL_HOST);
             $options['proxy_port'] = parse_url($proxy, PHP_URL_PORT);
         }
-        print_r($options);
         if (isset($settings['autosslca']) && $settings['autosslca']) {
             $this->addAutoSslOptions($options);
         }
