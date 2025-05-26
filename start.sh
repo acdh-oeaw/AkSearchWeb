@@ -82,12 +82,12 @@ if [ "$SOLR_URL" == "" ]; then
 fi
 cfgReplace '^url *=.*http.+/solr' "url = $SOLR_URL"
 
-##check the ACDH theme dir
+## Check the ACDH theme dir
 if [ ! -e "$VUFIND_HOME/themes/AcdhchTheme" ]; then
     mkdir -p "$VUFIND_HOME/themes/AcdhchTheme"
 fi
 
-##copy the theme
+## Copy the theme
 cp -rf $VUFIND_HOME/vendor/acdh-oeaw/ak-search-acdh-theme/* $VUFIND_HOME/themes/AcdhchTheme/
 chown www-data -R $VUFIND_HOME/themes/AcdhchTheme/
 
@@ -103,6 +103,10 @@ php -f $VUFIND_HOME/util/cssBuilder.php
 
 ### Remove harvesting locks
 rm -f /tmp/*lock
+
+### Overwrite the HarvesterFactory.php
+rm /usr/local/vufind/vendor/vufind-org/vufindharvest/src/OaiPmh/HarvesterFactory.php && \
+    ln -s /usr/local/vufind/vendor/vufind-org/vufindharvest/src/OaiPmh/HarvesterFactory.php /var/www/vufind/harvest/HarvesterFactory.php
 
 ### Run Apache
 echo "Starting Apache...!"
