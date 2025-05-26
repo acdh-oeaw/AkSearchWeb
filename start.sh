@@ -106,7 +106,7 @@ rm -f /tmp/*lock
 
 ### Overwrite the HarvesterFactory.php
 rm /usr/local/vufind/vendor/vufind-org/vufindharvest/src/OaiPmh/HarvesterFactory.php && \
-    ln -s /usr/local/vufind/vendor/vufind-org/vufindharvest/src/OaiPmh/HarvesterFactory.php /var/www/vufind/harvest/HarvesterFactory.php
+    ln -s /var/www/vufind/harvest/HarvesterFactory.php /usr/local/vufind/vendor/vufind-org/vufindharvest/src/OaiPmh/HarvesterFactory.php
 
 ### Run Apache
 echo "Starting Apache...!"
