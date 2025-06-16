@@ -25,6 +25,13 @@ if [ "$ALMA_URL" != "" ]; then
     sed -i -E "s|^apiBaseUrl *=.*|apiBaseUrl = $ALMA_URL|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
 fi
 
+### HTTP Proxy
+if [ "$HTTP_PROXY" != "" ]; then
+    PROXY_HOST=`echo $HTTP_PROXY | sed -e 's~.*://~~' -e 's/:.*//'`
+    PROXY_PORT=`echo $HTTP_PROXY | sed -e 's/^.*://' -e 's~/$~~'`
+    sed -i "s~^[Proxy]~[Proxy]\nhost = $PROXY_HOST\nport = $PROXY_PORT\nno_proxy = \"$NO_PROXY\"~" $VUFIND_LOCAL_DIR/config
+fi
+
 ### Database-related stuff
 if [ "$DB_PSWD" == "" ]; then
     echo "DB_PSWD environment variable not set"
