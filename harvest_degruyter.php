@@ -75,6 +75,9 @@ function listDav($cfg) {
         CURLOPT_INFILE => $body,
         CURLOPT_FILE => $response,
     ]);
+    if (!empty($cfg->proxy)) {
+        curl_setopt_array($h, [CURLOPT_HTTPPROXYTUNNEL => 1, CURLOPT_PROXY => $cfg->proxy]);
+    }
     curl_exec($h) ?: die(curl_error());
     curl_close($h);
     fclose($body);
@@ -101,6 +104,9 @@ function dwnldDav($cfg, $file, $outFile) {
         CURLOPT_USERNAME => $cfg->login,
         CURLOPT_FILE => $oh,
     ]);
+    if (!empty($cfg->proxy)) {
+        curl_setopt_array($h, [CURLOPT_HTTPPROXYTUNNEL => 1, CURLOPT_PROXY => $cfg->proxy]);
+    }
     curl_exec($h) ?: die(curl_error());
     curl_close($h);
     fclose($oh);

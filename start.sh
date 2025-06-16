@@ -25,6 +25,13 @@ if [ "$ALMA_URL" != "" ]; then
     sed -i -E "s|^apiBaseUrl *=.*|apiBaseUrl = $ALMA_URL|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
 fi
 
+### HTTP Proxy
+if [ "$HTTP_PROXY" != "" ]; then
+    PROXY_HOST=`echo $HTTP_PROXY | sed -e 's~.*://~~' -e 's/:.*//'`
+    PROXY_PORT=`echo $HTTP_PROXY | sed -e 's/^.*://' -e 's~/$~~'`
+    sed -i -e "s~^\[Proxy\]~[Proxy]\nhost = $PROXY_HOST\nport = $PROXY_PORT\nno_proxy = \"$NO_PROXY\"~" $VUFIND_LOCAL_DIR/config/vufind/config.ini
+fi
+
 ### Database-related stuff
 if [ "$DB_PSWD" == "" ]; then
     echo "DB_PSWD environment variable not set"
@@ -82,12 +89,12 @@ if [ "$SOLR_URL" == "" ]; then
 fi
 cfgReplace '^url *=.*http.+/solr' "url = $SOLR_URL"
 
-##check the ACDH theme dir
+## Check the ACDH theme dir
 if [ ! -e "$VUFIND_HOME/themes/AcdhchTheme" ]; then
     mkdir -p "$VUFIND_HOME/themes/AcdhchTheme"
 fi
 
-##copy the theme
+## Copy the theme
 cp -rf $VUFIND_HOME/vendor/acdh-oeaw/ak-search-acdh-theme/* $VUFIND_HOME/themes/AcdhchTheme/
 chown www-data -R $VUFIND_HOME/themes/AcdhchTheme/
 
@@ -100,6 +107,13 @@ sed -i -E "s|^.*SetEnv +APPLICATION_ENV.*|SetEnv APPLICATION_ENV \"$APPLICATION_
 
 echo "Rebuild css...."
 php -f $VUFIND_HOME/util/cssBuilder.php
+
+### Remove harvesting locks
+rm -f /tmp/*lock
+
+### Overwrite the HarvesterFactory.php
+rm /usr/local/vufind/vendor/vufind-org/vufindharvest/src/OaiPmh/HarvesterFactory.php && \
+    ln -s /var/www/vufind/harvest/HarvesterFactory.php /usr/local/vufind/vendor/vufind-org/vufindharvest/src/OaiPmh/HarvesterFactory.php
 
 ### Run Apache
 echo "Starting Apache...!"

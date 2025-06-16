@@ -1,0 +1,70 @@
+# docker-compose used on a dedicated production VM
+version: "2"
+services:
+  solr:
+    image: acdhch/aksearch-solr
+    environment:
+      - HTTP_PROXY=http://fifi.arz.oeaw.ac.at:8080/
+      - HTTPS_PROXY=http://fifi.arz.oeaw.ac.at:8080/
+      - NO_PROXY=127.0.0.1,localhost,10.3.6.33
+    volumes:
+      - solrlogs:/opt/solr/server/logs
+      - solrdata:/opt/solr/server/solr
+      - harvest-archive-basis:/opt/harvest/archive_basis
+      - harvest-archive-oeai:/opt/harvest/archive_oeai
+      - harvest-bib-alma:/opt/harvest/bib_alma
+      - harvest-bib-degruyter:/opt/harvest/bib_degruyter
+      - harvest-ebookcentral:/opt/harvest/bib_ebookcentral
+      - harvest-manual:/opt/harvest/manual
+    networks:
+      - backend
+  mysql:
+    image: mariadb:10
+    environment:
+      - MYSQL_ROOT_PASSWORD=***
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - backend
+  web:
+    image: acdhch/aksearch-web
+    environment:
+      - DB_PSWD=***
+      - DB_HOST=mysql
+      - DB_ROOT_PSWD=***
+      - SOLR_URL=http://solr:8983/solr
+      - ALMA_KEY=***
+      - VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
+      - APPLICATION_ENV=testing
+      - DEGRUYTER_PSWD=***
+      - HTTP_PROXY=http://fifi.arz.oeaw.ac.at:8080/
+      - HTTPS_PROXY=http://fifi.arz.oeaw.ac.at:8080/
+      - NO_PROXY=127.0.0.1,localhost,10.3.6.33
+    ports:
+      - "8080:80"
+    volumes:
+      - thumbnails:/var/www/cache/covers
+      - harvest-archive-basis:/var/www/local/harvest/archive_basis
+      - harvest-archive-oeai:/var/www/local/harvest/archive_oeai
+      - harvest-bib-alma:/var/www/local/harvest/bib_alma
+      - harvest-bib-degruyter:/var/www/local/harvest/bib_degruyter
+      - harvest-ebookcentral:/var/www/local/harvest/bib_ebookcentral
+      - harvest-manual:/var/www/local/harvest/manual
+    networks:
+      - backend
+    depends_on:
+      - mysql
+networks:
+  backend:
+    driver: bridge
+volumes:
+  solrlogs:
+  solrdata:
+  mysql:
+  thumbnails:
+  harvest-archive-basis:
+  harvest-archive-oeai:
+  harvest-bib-alma:
+  harvest-bib-degruyter:
+  harvest-ebookcentral:
+  harvest-manual:
