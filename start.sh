@@ -29,7 +29,7 @@ fi
 if [ "$HTTP_PROXY" != "" ]; then
     PROXY_HOST=`echo $HTTP_PROXY | sed -e 's~.*://~~' -e 's/:.*//'`
     PROXY_PORT=`echo $HTTP_PROXY | sed -e 's/^.*://' -e 's~/$~~'`
-    sed -i "s~^[Proxy]~[Proxy]\nhost = $PROXY_HOST\nport = $PROXY_PORT\nno_proxy = \"$NO_PROXY\"~" $VUFIND_LOCAL_DIR/config
+    sed -i "s~^[Proxy]~[Proxy]\nhost = $PROXY_HOST\nport = $PROXY_PORT\nno_proxy = \"$NO_PROXY\"~" $VUFIND_LOCAL_DIR/config/vufind/config.ini
 fi
 
 ### Database-related stuff
