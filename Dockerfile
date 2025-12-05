@@ -41,6 +41,7 @@ RUN cd /usr/local/vufind &&\
     sed -i -e '/phing-install-dependencies/d' composer.json &&\
     # for composer v2 compatibility \
     composer config allow-plugins true &&\
+    composer config audit.block-insecure false &&\
     sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json &&\
     composer update -o --no-dev &&\
     # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before) \
