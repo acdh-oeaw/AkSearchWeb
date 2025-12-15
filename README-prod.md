@@ -1,4 +1,4 @@
-# Dedicated producion VM setup
+# Dedicated production VM setup
 
 ## System setup
 
