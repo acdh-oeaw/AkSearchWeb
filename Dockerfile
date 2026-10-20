@@ -3,8 +3,16 @@ FROM php:7-apache
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 COPY local /var/www/local
 COPY start.sh /var/www/start.sh
-RUN apt update &&\
-    apt install -y git zip mariadb-client vim lftp libapache2-mod-evasive &&\
+# Debian 11 (the base of php:7-apache) reached end of LTS; pin its final
+# package repositories so builds do not depend on packages disappearing from
+# the live security mirror.
+RUN printf '%s\n' \
+        'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/20260831T210000Z bullseye main' \
+        'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian-security/20260831T210000Z bullseye-security main' \
+        'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/20260831T210000Z bullseye-updates main' \
+        > /etc/apt/sources.list &&\
+    apt-get update -o Acquire::Check-Valid-Until=false &&\
+    apt-get install -y git zip mariadb-client vim lftp libapache2-mod-evasive &&\
     echo 'syntax on\nfiletype plugin indent on\nset tabstop=4\nset shiftwidth=4\nset expandtab' > /root/.vimrc &&\
     ### PHP config \
     chmod +x /usr/local/bin/install-php-extensions &&\
