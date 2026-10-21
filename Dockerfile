@@ -10,7 +10,7 @@ RUN apt update &&\
     ### PHP config \
     chmod +x /usr/local/bin/install-php-extensions &&\
     sync &&\
-    install-php-extensions gd intl ldap mysqli soap xml xsl zip @composer-2 &&\
+    install-php-extensions gd intl ldap mysqli pdo_mysql soap xml xsl zip @composer-2 &&\
     cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 RUN a2enmod rewrite &&\
     a2enmod remoteip &&\
@@ -43,6 +43,7 @@ RUN cd /usr/local/vufind &&\
 #   The only other way to fix it would be to copy-paste to aksearch-ext and fix it there which is even more ugly
 RUN sed -i -e '/protected \$results;/d' /usr/local/vufind/module/AkSearch/src/AkSearch/Search/Solr/FacetCache.php
 USER root
+RUN sed -i 's#DocumentRoot /var/www/html#DocumentRoot /usr/local/vufind/public#' /etc/apache2/sites-available/000-default.conf
 WORKDIR /usr/local/vufind
 CMD ["/var/www/start.sh"]
 ENV VUFIND_HOME=/usr/local/vufind VUFIND_LOCAL_DIR=/var/www/local VUFIND_CACHE_DIR=/var/www/cache VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt

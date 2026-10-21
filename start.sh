@@ -62,15 +62,21 @@ DB_ROOT_PSWD=${DB_ROOT_PSWD:=__nopswd__}
 DB_USER=${DB_USER:=vufind}
 DB_NAME=${DB_NAME:=vufind}
 DB_ROOT=${DB_ROOT:=root}
+# MariaDB client 11 attempts TLS by default, but the configured MaxScale
+# endpoint does not support it. VuFind's PDO connection is configured
+# separately; this option applies only to the startup SQL commands below.
+mysql_cli() {
+    mysql --skip-ssl "$@"
+}
 DB_USER_ENCODED=$(php -r 'echo rawurlencode($argv[1]);' "$DB_USER")
 DB_PSWD_ENCODED=$(php -r 'echo rawurlencode($argv[1]);' "$DB_PSWD")
 DB_NAME_ENCODED=$(php -r 'echo rawurlencode($argv[1]);' "$DB_NAME")
 DB_CONN_STR="mysql://$DB_USER_ENCODED:$DB_PSWD_ENCODED@$DB_HOST/$DB_NAME_ENCODED"
 
 for i in {1..10}; do
-    dbok=`mysql -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -e "show databases;"`
+    dbok=`mysql_cli -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -e "show databases;"`
     if [ "$dbok" == "" ]; then
-        dbok=`mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "show databases;"`
+        dbok=`mysql_cli -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "show databases;"`
     fi
     if [ "$?" == "0" ]; then
         break
@@ -84,16 +90,16 @@ fi
 dbok=`echo "$dbok" | grep "$DB_NAME"`
 if [ "$dbok" == "" ]; then
     echo "Database doesn't exist - creating"
-    mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "CREATE DATABASE IF NOT EXISTS $DB_NAME" &&\
-    mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "DROP USER IF EXISTS '$DB_USER'@'%'" &&\
-    mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PSWD'" &&\
-    mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%' WITH GRANT OPTION" &&\
-    mysql -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "FLUSH PRIVILEGES"
+    mysql_cli -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "CREATE DATABASE IF NOT EXISTS $DB_NAME" &&\
+    mysql_cli -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "DROP USER IF EXISTS '$DB_USER'@'%'" &&\
+    mysql_cli -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PSWD'" &&\
+    mysql_cli -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%' WITH GRANT OPTION" &&\
+    mysql_cli -h "$DB_HOST" -u "$DB_ROOT" "-p$DB_ROOT_PSWD" -e "FLUSH PRIVILEGES"
 fi
-dbempty=`mysql -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -D "$DB_NAME" -e "show tables;" | wc -l`
+dbempty=`mysql_cli -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -D "$DB_NAME" -e "show tables;" | wc -l`
 if [ "$dbempty" == "0" ]; then
     echo "Database is empty - filling in with $VUFIND_HOME/module/VuFind/sql/mysql.sql"
-    mysql -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -D "$DB_NAME" < $VUFIND_HOME/module/VuFind/sql/mysql.sql
+    mysql_cli -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -D "$DB_NAME" < $VUFIND_HOME/module/VuFind/sql/mysql.sql
 fi
 
 if [ ! -e "$VUFIND_LOCAL_DIR/config/vufind/config.ini" ]; then
