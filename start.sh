@@ -4,6 +4,13 @@ export VUFIND_HOME=${VUFIND_HOME:=/usr/local/vufind}
 export VUFIND_LOCAL_DIR=${VUFIND_LOCAL_DIR:=/var/www/local}
 export VUFIND_CACHE_DIR=${VUFIND_CACHE_DIR:=/var/www/cache}
 
+if [ -n "$VUFIND_RUNTIME_LOCAL_DIR" ]; then
+    VUFIND_LOCAL_SOURCE_DIR=${VUFIND_LOCAL_SOURCE_DIR:-$VUFIND_LOCAL_DIR}
+    mkdir -p "$VUFIND_RUNTIME_LOCAL_DIR"
+    cp -a "$VUFIND_LOCAL_SOURCE_DIR"/. "$VUFIND_RUNTIME_LOCAL_DIR"/
+    export VUFIND_LOCAL_DIR="$VUFIND_RUNTIME_LOCAL_DIR"
+fi
+
 function cfgReplace {
     for cfgfile in `grep -Rl -E "$1" $VUFIND_HOME/config`; do
         sed -i -E "s~$1~$2~g" $cfgfile
@@ -25,6 +32,23 @@ if [ "$ALMA_URL" != "" ]; then
     sed -i -E "s|^apiBaseUrl *=.*|apiBaseUrl = $ALMA_URL|g" $VUFIND_LOCAL_DIR/config/vufind/Alma.ini
 fi
 
+### Apply an outbound HTTP proxy to VuFind's HTTP client settings.
+PROXY_URL=${HTTPS_PROXY:-${HTTP_PROXY:-}}
+if [ -n "$PROXY_URL" ]; then
+    PROXY_HOST=$(php -r '$u = parse_url($argv[1]); echo $u["host"] ?? "";' "$PROXY_URL")
+    PROXY_PORT=$(php -r '$u = parse_url($argv[1]); echo $u["port"] ?? (($u["scheme"] ?? "") === "https" ? 443 : 80);' "$PROXY_URL")
+    if [ -z "$PROXY_HOST" ]; then
+        echo "Could not parse HTTP_PROXY/HTTPS_PROXY URL"
+        exit 1
+    fi
+    PROXY_CONFIG="$VUFIND_LOCAL_DIR/config/vufind/config.ini"
+    if grep -qE '^host[[:space:]]*=' "$PROXY_CONFIG"; then
+        sed -i -E "s|^host[[:space:]]*=.*|host = $PROXY_HOST|; s|^port[[:space:]]*=.*|port = $PROXY_PORT|; s|^no_proxy[[:space:]]*=.*|no_proxy = \"${NO_PROXY:-}\"|" "$PROXY_CONFIG"
+    else
+        sed -i "/^\[Proxy\]/a host = $PROXY_HOST\nport = $PROXY_PORT\nno_proxy = \"${NO_PROXY:-}\"" "$PROXY_CONFIG"
+    fi
+fi
+
 ### Database-related stuff
 if [ "$DB_PSWD" == "" ]; then
     echo "DB_PSWD environment variable not set"
@@ -38,7 +62,10 @@ DB_ROOT_PSWD=${DB_ROOT_PSWD:=__nopswd__}
 DB_USER=${DB_USER:=vufind}
 DB_NAME=${DB_NAME:=vufind}
 DB_ROOT=${DB_ROOT:=root}
-DB_CONN_STR="mysql://$DB_USER:$DB_PSWD@$DB_HOST/$DB_NAME"
+DB_USER_ENCODED=$(php -r 'echo rawurlencode($argv[1]);' "$DB_USER")
+DB_PSWD_ENCODED=$(php -r 'echo rawurlencode($argv[1]);' "$DB_PSWD")
+DB_NAME_ENCODED=$(php -r 'echo rawurlencode($argv[1]);' "$DB_NAME")
+DB_CONN_STR="mysql://$DB_USER_ENCODED:$DB_PSWD_ENCODED@$DB_HOST/$DB_NAME_ENCODED"
 
 for i in {1..10}; do
     dbok=`mysql -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -e "show databases;"`
@@ -74,6 +101,9 @@ if [ ! -e "$VUFIND_LOCAL_DIR/config/vufind/config.ini" ]; then
     cp "$VUFIND_HOME/config/vufind/config.ini" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
 fi
 sed -i -e "s|^database *=.*|database = \"$DB_CONN_STR\"|g" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
+if [ -n "$SITE_URL" ]; then
+    sed -i -E "/^\[Site\]/,/^\[/ s|^url[[:space:]]*=.*|url = \"$SITE_URL\"|" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
+fi
 
 ### Update Solr URL in config files
 if [ "$SOLR_URL" == "" ]; then
@@ -82,17 +112,23 @@ if [ "$SOLR_URL" == "" ]; then
 fi
 cfgReplace '^url *=.*http.+/solr' "url = $SOLR_URL"
 
-##check the ACDH theme dir
-if [ ! -e "$VUFIND_HOME/themes/AcdhchTheme" ]; then
-    mkdir -p "$VUFIND_HOME/themes/AcdhchTheme"
+## Install the theme unless a local development mount is already in place.
+if [ "$SKIP_THEME_INSTALL" != "true" ]; then
+    if [ ! -e "$VUFIND_HOME/themes/AcdhchTheme" ]; then
+        mkdir -p "$VUFIND_HOME/themes/AcdhchTheme"
+    fi
+    cp -rf "$VUFIND_HOME/vendor/acdh-oeaw/ak-search-acdh-theme"/* "$VUFIND_HOME/themes/AcdhchTheme/"
+    chown www-data -R "$VUFIND_HOME/themes/AcdhchTheme/"
 fi
-
-##copy the theme
-cp -rf $VUFIND_HOME/vendor/acdh-oeaw/ak-search-acdh-theme/* $VUFIND_HOME/themes/AcdhchTheme/
-chown www-data -R $VUFIND_HOME/themes/AcdhchTheme/
-cd $VUFIND_HOME/themes/AcdhchTheme/
+cd "$VUFIND_HOME/themes/AcdhchTheme/"
 php -f utils/compile-sass.php
-cd /usr/local/vufind
+cd "$VUFIND_HOME"
+
+### Use the proxy-aware OAI harvester factory when supplied by this deployment.
+HARVESTER_FACTORY="$VUFIND_HOME/vendor/vufind-org/vufindharvest/src/OaiPmh/HarvesterFactory.php"
+if [ -f "$VUFIND_HOME/harvest/HarvesterFactory.php" ] && [ -f "$HARVESTER_FACTORY" ]; then
+    ln -sf "$VUFIND_HOME/harvest/HarvesterFactory.php" "$HARVESTER_FACTORY"
+fi
 
 ### Apache
 sed -i -E "s|^.*SetEnv +VUFIND_LOCAL_DIR.*|SetEnv VUFIND_LOCAL_DIR \"$VUFIND_LOCAL_DIR\"|g" /etc/apache2/conf-enabled/vufind.conf

@@ -1,2 +1,4 @@
 /vendor
 /composer.lock
+/.env.vufind10
+/.env.vufind10.prod

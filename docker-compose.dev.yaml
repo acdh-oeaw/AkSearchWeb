@@ -1,0 +1,126 @@
+name: ${COMPOSE_PROJECT_NAME:-aksearch-vufind10}
+
+services:
+  solr:
+    image: acdhch/aksearch-solr:vufind10
+    volumes:
+      - solr-logs:/opt/solr/server/logs
+      - solr-data:/opt/solr/server/solr
+      - harvest-alma:/opt/harvest/bib_alma
+      - harvest-almamin:/opt/harvest/bib_almamin
+      - harvest-archive-basis:/opt/harvest/archive_basis
+      - harvest-archive-oeai:/opt/harvest/archive_oeai
+      - harvest-archive-oeai-internal:/opt/harvest/archive_oeai_internal
+      - harvest-isa-sample:/opt/harvest/archive_isa_sample
+      - harvest-isa-dostal:/opt/harvest/archive_isa_dostal
+      - harvest-isa-finke:/opt/harvest/archive_isa_finke
+      - harvest-isa-escher:/opt/harvest/archive_isa_escher
+      - harvest-degruyter:/opt/harvest/bib_degruyter
+      - ../AkSearchSolr-vufind10/local:/opt/local:ro
+    networks: [backend]
+
+  mariadb:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env.vufind10}
+      MARIADB_DATABASE: ${DB_NAME:-vufind}
+      MARIADB_USER: ${DB_USER:-vufind}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env.vufind10}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks: [backend]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      DB_HOST: mariadb
+      DB_USER: ${DB_USER:-vufind}
+      DB_NAME: ${DB_NAME:-vufind}
+      DB_PSWD: ${DB_PASSWORD:?Set DB_PASSWORD in .env.vufind10}
+      DB_ROOT: root
+      DB_ROOT_PSWD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env.vufind10}
+      SOLR_URL: http://solr:8983/solr
+      ALMA_KEY: ${ALMA_KEY:?Set ALMA_KEY in .env.vufind10}
+      SITE_URL: ${SITE_URL:-http://localhost:8081}
+      DEGRUYTER_USER: ${DEGRUYTER_USER:-}
+      DEGRUYTER_PASSWORD: ${DEGRUYTER_PASSWORD:-}
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,solr,mariadb}
+      APPLICATION_ENV: development
+      VUFIND_LOCAL_MODULES: AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
+      SKIP_THEME_INSTALL: "true"
+      VUFIND_LOCAL_SOURCE_DIR: /var/www/local
+      VUFIND_RUNTIME_LOCAL_DIR: /var/www/runtime-local
+    ports:
+      - "${AKSEARCH_DIRECT_WEB_PORT:-8082}:80"
+    volumes:
+      - ./local:/var/www/local:ro
+      - ../AkSearchExtend-vufind10:/usr/local/vufind/vendor/acdh-oeaw/aksearch-ext
+      - ../AkSearchAcdhTheme-vufind10:/usr/local/vufind/themes/AcdhchTheme
+      - harvest-alma:/var/www/runtime-local/harvest/bib_alma
+      - harvest-almamin:/var/www/runtime-local/harvest/bib_almamin
+      - harvest-archive-basis:/var/www/runtime-local/harvest/archive_basis
+      - harvest-archive-oeai:/var/www/runtime-local/harvest/archive_oeai
+      - harvest-archive-oeai-internal:/var/www/runtime-local/harvest/archive_oeai_internal
+      - harvest-isa-sample:/var/www/runtime-local/harvest/archive_isa_sample
+      - harvest-isa-dostal:/var/www/runtime-local/harvest/archive_isa_dostal
+      - harvest-isa-finke:/var/www/runtime-local/harvest/archive_isa_finke
+      - harvest-isa-escher:/var/www/runtime-local/harvest/archive_isa_escher
+      - harvest-degruyter:/var/www/runtime-local/harvest/bib_degruyter
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      solr:
+        condition: service_started
+    networks: [backend]
+
+  anubis:
+    image: ghcr.io/techarohq/anubis:latest
+    environment:
+      BIND: :8080
+      METRICS_BIND: :9090
+      DIFFICULTY: 4
+      TARGET: http://web:80
+      ED25519_PRIVATE_KEY_HEX: ${ANUBIS_PRIVATE_KEY_HEX:?Set ANUBIS_PRIVATE_KEY_HEX in .env.vufind10}
+      SERVE_ROBOTS_TXT: "true"
+      USE_REMOTE_ADDRESS: "false"
+      COOKIE_SECURE: "false"
+      COOKIE_SAME_SITE: Lax
+    depends_on: [web]
+    networks: [edge, backend]
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "${AKSEARCH_WEB_PORT:-8081}:80"
+    volumes:
+      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro
+    depends_on: [anubis]
+    networks: [edge]
+
+networks:
+  backend:
+  edge:
+
+volumes:
+  solr-logs:
+  solr-data:
+  mariadb-data:
+  harvest-alma:
+  harvest-almamin:
+  harvest-archive-basis:
+  harvest-archive-oeai:
+  harvest-archive-oeai-internal:
+  harvest-isa-sample:
+  harvest-isa-dostal:
+  harvest-isa-finke:
+  harvest-isa-escher:
+  harvest-degruyter:

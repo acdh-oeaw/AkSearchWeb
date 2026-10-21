@@ -286,7 +286,8 @@ AllFields:
     - isbn
     - issn
     - long_lat_display
-    - ctrlnum^750
+    - ctrlnum
+    - ids_txt_mv
   DismaxHandler: edismax
 #  ExactSettings:
 #    DismaxFields:

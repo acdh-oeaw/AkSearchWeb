@@ -43,6 +43,26 @@ docker run -d -p 80:80 --name aksearch-web -e DB_HOST=db.host -e DB_PSWD=strongP
 
 If connections with Solr and MySQL/MariaDb database works fine, you should be able to open the AkSearch in your browser using the http://127.0.0.1/vufind/ URL.
 
+### Isolated VuFind 10 development stack
+
+The development stack is in `docker-compose.dev.yaml`. It builds the PHP 8.4 web image from this worktree and mounts the companion `AkSearchExtend-vufind10`, `AkSearchAcdhTheme-vufind10`, and `AkSearchSolr-vufind10` worktrees. It has its own Compose project, Solr, MariaDB, and harvest volumes. The default public entry point is `http://localhost:8081` (Caddy and Anubis); the web container is also available directly at `http://localhost:8082`.
+
+From this worktree, create a private settings file and edit its credentials and Alma test key:
+
+```sh
+cp .env.vufind10.example .env.vufind10
+```
+
+Then build and start the services:
+
+```sh
+docker compose --env-file .env.vufind10 -f docker-compose.dev.yaml up --build -d
+```
+
+Follow startup with `docker compose --env-file .env.vufind10 -f docker-compose.dev.yaml logs -f web`. Stop the stack with `docker compose --env-file .env.vufind10 -f docker-compose.dev.yaml down`; omit `-v` to retain its isolated data. To remove this stack's databases and indexes intentionally, use `down -v`.
+
+The real `.env.vufind10` is ignored by Git. Keep credentials there and use disposable credentials and API keys for local development. The example file contains only placeholders. Data volumes are scoped to the `aksearch-vufind10` Compose project, so they do not reuse the existing `main` stack's stores.
+
 ### Environment variables
 
 | Environment Variable | Required | Default | Description                                                            |
@@ -125,21 +145,7 @@ See the *Appendix - useful Docker commands* below for instructions on mounting h
 
 ## Solr and/or MariaDb deployment using attached docker-compose.yaml
 
-The easiest way to deploy dependencies is to use the `docker-compose.yaml` file provided by this repository.
-
-* Download https://github.com/acdh-oeaw/AkSearchWeb/blob/main/docker-compose.yaml.
-* Open it and adjust:
-    * Change passwords (`MYSQL_ROOT_PASSWORD`, `DB_PSWD`, `DB_ROOT_PSWD`, be aware `MYSQL_ROOT_PASSWORD` and `DB_ROOT_PSWD` have to be equal)
-    * If you already have a Solr or MySQL/MariaDb database remove corresponding parts of the file
-      (and make sure environment variables in the `services->ak-web->environment` are in line with your already existing service config)
-    * If you want direct access to Solr and/or MariaDb, add a `ports` section to their definitions (just like it's done for the `ak-web`).
-      Solr works on port 8983 while MariaDb on 3306.
-      The reason for not providing such mappings is the `docker-compose.yaml` is that it makes both services easily accessible which might be not desiread as e.g. Solr has no authorization by default.
-* Open console, go to the directory with the `docker-compose.yaml` and run
-  ```bash
-  docker compose up
-  ```
-    * To shut down containers just hit `CTRL+C` on the console where `docker-compose up` displays containers' logs.
+Use the tracked `.env.vufind10.prod.example` to create a private `.env.vufind10.prod` file, then replace every credential placeholder. The populated file is ignored by Git. Start the deployment with `docker compose --env-file .env.vufind10.prod -f docker-compose.yaml up -d`; stop it with the matching `down` command. The Compose project name is set to `aksearch-vufind10-prod` so its named volumes do not overlap with the VuFind 10 development stack. See [README-prod.md](README-prod.md) for deployment notes.
 
 ## Importing sample data
 

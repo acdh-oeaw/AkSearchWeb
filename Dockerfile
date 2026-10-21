@@ -3,6 +3,7 @@ FROM php:8.4-apache
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 COPY local /var/www/local
 COPY start.sh /var/www/start.sh
+COPY scripts/update-vufind-dependencies.php /tmp/update-vufind-dependencies.php
 RUN apt update &&\
     apt install -y git zip mariadb-client vim lftp libapache2-mod-evasive nodejs npm grunt&&\
     echo 'syntax on\nfiletype plugin indent on\nset tabstop=4\nset shiftwidth=4\nset expandtab' > /root/.vimrc &&\
@@ -15,10 +16,11 @@ RUN a2enmod rewrite &&\
     a2enmod remoteip &&\
     # Use vanila VuFind for a base and AkSearch only as modules but skip the main aksearch repo
     git clone --depth 1 -b v10.1.1 https://github.com/vufind-org/vufind.git /usr/local/vufind &&\
-    git clone --depth 1 -b aksearch-10 https://biapps.arbeiterkammer.at/gitlab/open/aksearch/module-core.git    /usr/local/vufind/module/AkSearch &&\
+    git clone --depth 1 -b aksearch-10 https://github.com/acdh-oeaw/aksearch-module-core.git          /usr/local/vufind/module/AkSearch &&\
     git clone --depth 1 -b aksearch-10 https://biapps.arbeiterkammer.at/gitlab/open/aksearch/module-api.git     /usr/local/vufind/module/AkSearchApi &&\
     git clone --depth 1 -b aksearch-10 https://biapps.arbeiterkammer.at/gitlab/open/aksearch/module-console.git /usr/local/vufind/module/AkSearchConsole &&\
     git clone --depth 1 -b aksearch-10 https://biapps.arbeiterkammer.at/gitlab/open/aksearch/module-search      /usr/local/vufind/module/AkSearchSearch &&\
+    php /tmp/update-vufind-dependencies.php /usr/local/vufind/composer.json &&\
     ### Apache \
     chown -R www-data:www-data /var/www /usr/local/vufind &&\
     ln -s /var/www/local/config/vufind/httpd-vufind.conf /etc/apache2/conf-enabled/vufind.conf &&\
@@ -30,11 +32,6 @@ COPY harvest/* /usr/local/vufind/harvest/
 ### VuFind config tuning which can be done as a www-data user
 USER www-data
 RUN cd /usr/local/vufind &&\
-    # remove automatic installation of solr and swaggerui \
-    sed -i -e '/phing-install-dependencies/d' composer.json &&\
-    # for composer v2 compatibility \
-    composer config allow-plugins true &&\
-    sed -i -e 's/composer-merge-plugin".*/composer-merge-plugin": "^2",/g' composer.json &&\
     composer update -o --no-dev &&\
     # second time for the wikimedia/composer-merge-plugin to work (wasn't installed a line before) \
     composer update -o --no-dev &&\
