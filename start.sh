@@ -68,10 +68,6 @@ DB_ROOT=${DB_ROOT:=root}
 mysql_cli() {
     mysql --skip-ssl "$@"
 }
-DB_USER_ENCODED=$(php -r 'echo rawurlencode($argv[1]);' "$DB_USER")
-DB_PSWD_ENCODED=$(php -r 'echo rawurlencode($argv[1]);' "$DB_PSWD")
-DB_NAME_ENCODED=$(php -r 'echo rawurlencode($argv[1]);' "$DB_NAME")
-DB_CONN_STR="mysql://$DB_USER_ENCODED:$DB_PSWD_ENCODED@$DB_HOST/$DB_NAME_ENCODED"
 
 for i in {1..10}; do
     dbok=`mysql_cli -h "$DB_HOST" -u "$DB_USER" "-p$DB_PSWD" -e "show databases;"`
@@ -106,7 +102,14 @@ if [ ! -e "$VUFIND_LOCAL_DIR/config/vufind/config.ini" ]; then
     mkdir -p "$VUFIND_LOCAL_DIR/config/vufind" &&\
     cp "$VUFIND_HOME/config/vufind/config.ini" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
 fi
-sed -i -e "s|^database *=.*|database = \"$DB_CONN_STR\"|g" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
+DB_PASSWORD_FILE="$VUFIND_LOCAL_DIR/config/vufind/database-password"
+umask 077
+printf '%s' "$DB_PSWD" > "$DB_PASSWORD_FILE"
+chown www-data:www-data "$DB_PASSWORD_FILE"
+chmod 600 "$DB_PASSWORD_FILE"
+php /tmp/configure-vufind-database.php \
+    "$VUFIND_LOCAL_DIR/config/vufind/config.ini" \
+    "$DB_HOST" "$DB_USER" "$DB_NAME" "$DB_PASSWORD_FILE"
 if [ -n "$SITE_URL" ]; then
     sed -i -E "/^\[Site\]/,/^\[/ s|^url[[:space:]]*=.*|url = \"$SITE_URL\"|" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
 fi

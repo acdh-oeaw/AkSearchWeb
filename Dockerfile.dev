@@ -4,6 +4,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 COPY local /var/www/local
 COPY start.sh /var/www/start.sh
 COPY scripts/update-vufind-dependencies.php /tmp/update-vufind-dependencies.php
+COPY scripts/configure-vufind-database.php /tmp/configure-vufind-database.php
 RUN apt update &&\
     apt install -y git zip mariadb-client vim lftp libapache2-mod-evasive nodejs npm grunt&&\
     echo 'syntax on\nfiletype plugin indent on\nset tabstop=4\nset shiftwidth=4\nset expandtab' > /root/.vimrc &&\
