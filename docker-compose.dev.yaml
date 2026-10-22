@@ -49,6 +49,7 @@ services:
       SOLR_URL: http://solr:8983/solr
       ALMA_KEY: ${ALMA_KEY:?Set ALMA_KEY in .env.vufind10}
       SITE_URL: ${SITE_URL:-http://localhost:8081}
+      VUFIND_SESSION_NAME: ${VUFIND_SESSION_NAME:-VUFIND10_LOCAL_SESSION}
       DEGRUYTER_USER: ${DEGRUYTER_USER:-}
       DEGRUYTER_PASSWORD: ${DEGRUYTER_PASSWORD:-}
       HTTP_PROXY: ${HTTP_PROXY:-}

@@ -110,6 +110,14 @@ chmod 600 "$DB_PASSWORD_FILE"
 php /tmp/configure-vufind-database.php \
     "$VUFIND_LOCAL_DIR/config/vufind/config.ini" \
     "$DB_HOST" "$DB_USER" "$DB_NAME" "$DB_PASSWORD_FILE"
+if [ -n "$VUFIND_SESSION_NAME" ]; then
+    SESSION_CONFIG="$VUFIND_LOCAL_DIR/config/vufind/config.ini"
+    if grep -qE '^[[:space:]]*session_name[[:space:]]*=' "$SESSION_CONFIG"; then
+        sed -i -E "s|^[[:space:]]*session_name[[:space:]]*=.*|session_name = $VUFIND_SESSION_NAME|" "$SESSION_CONFIG"
+    else
+        sed -i "/^\[Cookies\]/a session_name = $VUFIND_SESSION_NAME" "$SESSION_CONFIG"
+    fi
+fi
 if [ -n "$SITE_URL" ]; then
     sed -i -E "/^\[Site\]/,/^\[/ s|^url[[:space:]]*=.*|url = \"$SITE_URL\"|" "$VUFIND_LOCAL_DIR/config/vufind/config.ini"
 fi
