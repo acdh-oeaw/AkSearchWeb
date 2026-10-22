@@ -16,7 +16,7 @@ services:
       - harvest-isa-finke:/opt/harvest/archive_isa_finke
       - harvest-isa-escher:/opt/harvest/archive_isa_escher
       - harvest-degruyter:/opt/harvest/bib_degruyter
-      - ../AkSearchSolr-vufind10/local:/opt/local:ro
+      - ../AkSearchSolr-vufind10/local:/opt/local:ro,z
     networks: [backend]
 
   mariadb:
@@ -62,9 +62,9 @@ services:
     ports:
       - "${AKSEARCH_DIRECT_WEB_PORT:-8082}:80"
     volumes:
-      - ./local:/var/www/local:ro
-      - ../AkSearchExtend-vufind10:/usr/local/vufind/vendor/acdh-oeaw/aksearch-ext
-      - ../AkSearchAcdhTheme-vufind10:/usr/local/vufind/themes/AcdhchTheme
+      - ./local:/var/www/local:ro,z
+      - ../AkSearchExtend-vufind10:/usr/local/vufind/vendor/acdh-oeaw/aksearch-ext:z
+      - ../AkSearchAcdhTheme-vufind10:/usr/local/vufind/themes/AcdhchTheme:z
       - harvest-alma:/var/www/runtime-local/harvest/bib_alma
       - harvest-almamin:/var/www/runtime-local/harvest/bib_almamin
       - harvest-archive-basis:/var/www/runtime-local/harvest/archive_basis
@@ -102,7 +102,7 @@ services:
     ports:
       - "${AKSEARCH_WEB_PORT:-8081}:80"
     volumes:
-      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro,z
     depends_on: [anubis]
     networks: [edge]
 
