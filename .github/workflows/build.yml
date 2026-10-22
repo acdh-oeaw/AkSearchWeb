@@ -25,7 +25,7 @@ jobs:
     - name: verify VuFind 10 PHP version
       if: github.ref_name == 'vufind10'
       run: |
-        docker run --rm --entrypoint php $IMAGE:$TAG -r 'echo PHP_VERSION, PHP_EOL; if (PHP_VERSION_ID !== 80427) { exit(1); }'
+        docker run --rm --entrypoint php $IMAGE:$TAG -r 'echo PHP_VERSION, PHP_EOL; if (PHP_VERSION_ID !== 80512) { exit(1); }'
     - name: report installed dependencies
       run: |
         docker run --rm --entrypoint php $IMAGE:$TAG -r '$lock = json_decode(file_get_contents("/usr/local/vufind/composer.lock"), true); foreach (["acdh-oeaw/ak-search-acdh-theme", "acdh-oeaw/aksearch-ext"] as $name) { foreach ($lock["packages"] as $package) { if ($package["name"] === $name) { echo $name, " ", $package["source"]["reference"], PHP_EOL; continue 2; } } exit(1); }'
