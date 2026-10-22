@@ -44,7 +44,6 @@ jobs:
             docker push $IMAGE:latest
         fi
     - name: redeploy
-      if: github.ref_name != 'vufind10'
       run: |
         NMSP=oeaw-resources-dev
         # yes, fv10 is a typo but recreating a namespace in rancher is too much work to fix it
