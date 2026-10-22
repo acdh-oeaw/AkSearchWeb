@@ -1,4 +1,4 @@
-FROM php:8.4-apache
+FROM php:8.4.27-apache-trixie
 # see https://github.com/mlocati/docker-php-extension-installer#downloading-the-script-on-the-fly
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 COPY start.sh /var/www/start.sh
