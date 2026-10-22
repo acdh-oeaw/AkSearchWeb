@@ -1,7 +1,7 @@
 name: build and publish docker image
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, vufind10]
   workflow_dispatch: ~
 
 env:
@@ -22,6 +22,12 @@ jobs:
     - name: docker build
       run: |
         docker build -t $IMAGE:$TAG --label "buildUrl=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" .
+    - name: report installed dependencies
+      run: |
+        docker run --rm --entrypoint php $IMAGE:$TAG -r '$lock = json_decode(file_get_contents("/usr/local/vufind/composer.lock"), true); foreach (["acdh-oeaw/ak-search-acdh-theme", "acdh-oeaw/aksearch-ext"] as $name) { foreach ($lock["packages"] as $package) { if ($package["name"] === $name) { echo $name, " ", $package["source"]["reference"], PHP_EOL; continue 2; } } exit(1); }'
+    - name: lint installed PHP
+      run: |
+        docker run --rm --entrypoint sh $IMAGE:$TAG -c 'find /usr/local/vufind/vendor/acdh-oeaw/aksearch-ext/src /usr/local/vufind/themes/AcdhchTheme/templates -type f \( -name "*.php" -o -name "*.phtml" \) -print0 | xargs -0 -n1 php -l'
     - uses: docker/login-action@v3
       with:
         username: zozlak
@@ -38,6 +44,7 @@ jobs:
             docker push $IMAGE:latest
         fi
     - name: redeploy
+      if: github.ref_name != 'vufind10'
       run: |
         NMSP=oeaw-resources-dev
         # yes, fv10 is a typo but recreating a namespace in rancher is too much work to fix it

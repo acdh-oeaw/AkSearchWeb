@@ -36,9 +36,16 @@ services:
       retries: 20
 
   web:
+    image: aksearch-vufind10-web:latest
     build:
       context: .
       dockerfile: Dockerfile.dev
+      additional_contexts:
+        theme: ../AkSearchAcdhTheme-vufind10
+        extend: ../AkSearchExtend-vufind10
+      args:
+        THEME_COMMIT: ${THEME_COMMIT:-unknown}
+        EXTEND_COMMIT: ${EXTEND_COMMIT:-unknown}
     environment:
       DB_HOST: mariadb
       DB_USER: ${DB_USER:-vufind}

@@ -53,11 +53,14 @@ From this worktree, create a private settings file and edit its credentials and 
 cp .env.vufind10.example .env.vufind10
 ```
 
-Then build and start the services:
+Build the local images and check that the Web image contains the Theme and Extend sources from these worktrees, then start the services:
 
 ```sh
-docker compose --env-file .env.vufind10 -f docker-compose.dev.yaml up --build -d
+./scripts/build-vufind10-local.sh
+docker compose --env-file .env.vufind10 -f docker-compose.dev.yaml up --no-build -d
 ```
+
+The build script labels the Web image with the Theme and Extend HEAD commits and compares representative files in the image with their source worktrees. It reports uncommitted changes in either companion worktree because the commit labels alone cannot identify those changes. Rebuild after changing a worktree; Compose mounts the live sources for local iteration. Rancher deployment is a separate action.
 
 Follow startup with `docker compose --env-file .env.vufind10 -f docker-compose.dev.yaml logs -f web`. Stop the stack with `docker compose --env-file .env.vufind10 -f docker-compose.dev.yaml down`; omit `-v` to retain its isolated data. To remove this stack's databases and indexes intentionally, use `down -v`.
 

@@ -1,7 +1,6 @@
 FROM php:8.4-apache
 # see https://github.com/mlocati/docker-php-extension-installer#downloading-the-script-on-the-fly
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-COPY local /var/www/local
 COPY start.sh /var/www/start.sh
 COPY scripts/update-vufind-dependencies.php /tmp/update-vufind-dependencies.php
 COPY scripts/configure-vufind-database.php /tmp/configure-vufind-database.php
@@ -39,12 +38,18 @@ RUN cd /usr/local/vufind &&\
     # setup swaggerui \
     vendor/bin/phing installswaggerui &&\
     mkdir /var/www/cache
+ARG THEME_COMMIT=unknown
+ARG EXTEND_COMMIT=unknown
+COPY --from=theme / /usr/local/vufind/themes/AcdhchTheme/
+COPY --from=extend / /usr/local/vufind/vendor/acdh-oeaw/aksearch-ext/
+LABEL org.aksearch.theme-commit=$THEME_COMMIT org.aksearch.extend-commit=$EXTEND_COMMIT
 # AkSearch dirty hacks
 #   Incompatible with PHP 8.4 class inheritance but anyway defined in the parent class
 #   The only other way to fix it would be to copy-paste to aksearch-ext and fix it there which is even more ugly
 RUN sed -i -e '/protected \$results;/d' /usr/local/vufind/module/AkSearch/src/AkSearch/Search/Solr/FacetCache.php
 USER root
 RUN sed -i 's#DocumentRoot /var/www/html#DocumentRoot /usr/local/vufind/public#' /etc/apache2/sites-available/000-default.conf
+COPY local /var/www/local
 WORKDIR /usr/local/vufind
 CMD ["/var/www/start.sh"]
 ENV VUFIND_HOME=/usr/local/vufind VUFIND_LOCAL_DIR=/var/www/local VUFIND_CACHE_DIR=/var/www/cache VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
