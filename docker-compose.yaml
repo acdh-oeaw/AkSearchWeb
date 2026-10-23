@@ -2,7 +2,7 @@ name: ${COMPOSE_PROJECT_NAME:-aksearch-vufind10-prod}
 
 services:
   solr:
-    image: acdhch/aksearch-solr:vufind10
+    image: acdhch/aksearch-solr:latest
     volumes:
       - solr-logs:/opt/solr/server/logs
       - solr-data:/opt/solr/server/solr
@@ -27,7 +27,7 @@ services:
     networks: [backend]
 
   web:
-    image: acdhch/aksearch-web:vufind10
+    image: acdhch/aksearch-web:main
     environment:
       DB_HOST: mariadb
       DB_USER: ${DB_USER:-vufind}
