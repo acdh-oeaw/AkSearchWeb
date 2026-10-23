@@ -1,0 +1,8 @@
+:80 {
+  reverse_proxy anubis:8080 {
+    header_up Host {host}
+    header_up X-Real-Ip {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+}
