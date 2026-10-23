@@ -29,8 +29,8 @@
  * files procesable by the batch-import-marc.sh (basically in the same format
  * as produced by the {vufind}/harvest/harvest_oai.php).
  */
-if (count($argv) < 3) {
-    echo "Usage: $argv[0] cfgFile password\n";
+if (count($argv) < 2) {
+    echo "Usage: $argv[0] cfgFile [password]\n";
     exit(1);
 }
 $cfg = json_decode(file_get_contents($argv[1]));
@@ -44,14 +44,24 @@ if (file_exists($lastUpdateFile)) {
 } else {
     $lastUpdate = null;
 }
-$cfg->pswd = $argv[2];
+$cfg->login = getenv('DEGRUYTER_USER') ?: $cfg->login;
+$cfg->pswd = $argv[2] ?? getenv('DEGRUYTER_PASSWORD');
+$proxy = getenv('HTTPS_PROXY') ?: getenv('HTTP_PROXY');
+$cfg->proxy = $proxy ?: ($cfg->proxy ?? null);
+$cfg->ftpInit = 'set ftp:use-hftp no;set xfer:clobber on;';
+if ($proxy) {
+    $cfg->ftpInit = 'set ftp:proxy ' . $proxy . ';' . $cfg->ftpInit;
+}
+if (!$cfg->pswd) {
+    die("Set DEGRUYTER_PASSWORD or pass the password as the second argument.\n");
+}
 
 function execFtp($cfg, $command) {
     $cmd = "$cfg->ftpInit;open $cfg->server;user $cfg->login $cfg->pswd;$command;quit;";
     $cmd = "/usr/bin/lftp -e " . escapeshellarg($cmd);
     exec($cmd, $output, $result);
     if ($result !== 0) {
-        echo "ERROR:\n$cmd\n$result\n".implode("\n", $output);
+        echo "De Gruyter FTP command failed (exit $result).\n" . implode("\n", $output);
         return false;
     }
     return count($output) === 0 ? ['OK'] : $output;
@@ -66,6 +76,7 @@ function listDav($cfg) {
     curl_setopt_array($h, [
         CURLOPT_URL => $cfg->server,
         CURLOPT_USERNAME => $cfg->login,
+        CURLOPT_PASSWORD => $cfg->pswd,
         CURLOPT_HTTPHEADER => [
             'Accept' => 'application/xml',
             'Depth' => '1',
@@ -102,6 +113,7 @@ function dwnldDav($cfg, $file, $outFile) {
     curl_setopt_array($h, [
         CURLOPT_URL => $cfg->server . '/' . $file,
         CURLOPT_USERNAME => $cfg->login,
+        CURLOPT_PASSWORD => $cfg->pswd,
         CURLOPT_FILE => $oh,
     ]);
     if (!empty($cfg->proxy)) {

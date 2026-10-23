@@ -1,49 +1,82 @@
-version: "2"
+name: ${COMPOSE_PROJECT_NAME:-aksearch-vufind10-prod}
+
 services:
-  ak-solr:
-    image: acdhch/aksearch-solr
+  solr:
+    image: acdhch/aksearch-solr:vufind10
     volumes:
-      - ak-solrlogs:/opt/solr/server/logs
-      - ak-solrdata:/opt/solr/server/solr
-      - ak-harvest:/opt/harvest/alma
-      - ak-harvest-degruyter:/opt/harvest/degruyter
-    networks:
-      - backend
-  ak-mysql:
-    image: mariadb:10
+      - solr-logs:/opt/solr/server/logs
+      - solr-data:/opt/solr/server/solr
+      - harvest-alma:/opt/harvest/bib_alma
+      - harvest-almamin:/opt/harvest/bib_almamin
+      - harvest-archive-basis:/opt/harvest/archive_basis
+      - harvest-archive-oeai:/opt/harvest/archive_oeai
+      - harvest-archive-oeai-internal:/opt/harvest/archive_oeai_internal
+      - harvest-isa-sample:/opt/harvest/archive_isa_sample
+      - harvest-isa-dostal:/opt/harvest/archive_isa_dostal
+      - harvest-isa-finke:/opt/harvest/archive_isa_finke
+      - harvest-isa-escher:/opt/harvest/archive_isa_escher
+      - harvest-degruyter:/opt/harvest/bib_degruyter
+    networks: [backend]
+
+  mariadb:
+    image: mariadb:10.11
     environment:
-      - MYSQL_ROOT_PASSWORD=123qwe
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in the deployment env file}
     volumes:
-      - ak-mysql:/var/lib/mysql
-    networks:
-      - backend
-  ak-web:
-    image: acdhch/aksearch-web
+      - mariadb-data:/var/lib/mysql
+    networks: [backend]
+
+  web:
+    image: acdhch/aksearch-web:vufind10
     environment:
-      - DB_PSWD=zxcasd
-      - DB_HOST=ak-mysql
-      - DB_ROOT_PSWD=123qwe
-      - SOLR_URL=http://ak-solr:8983/solr
-      - ALMA_KEY=xxx
-      - VUFIND_LOCAL_MODULES=AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
-      - APPLICATION_ENV=testing
+      DB_HOST: mariadb
+      DB_USER: ${DB_USER:-vufind}
+      DB_NAME: ${DB_NAME:-vufind}
+      DB_PSWD: ${DB_PASSWORD:?Set DB_PASSWORD in the deployment env file}
+      DB_ROOT: root
+      DB_ROOT_PSWD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in the deployment env file}
+      SOLR_URL: http://solr:8983/solr
+      ALMA_KEY: ${ALMA_KEY:?Set ALMA_KEY in the deployment env file}
+      SITE_URL: ${SITE_URL:?Set SITE_URL in the deployment env file}
+      DEGRUYTER_USER: ${DEGRUYTER_USER:-}
+      DEGRUYTER_PASSWORD: ${DEGRUYTER_PASSWORD:-}
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,solr,mariadb}
+      VUFIND_LOCAL_MODULES: AkSearch,AkSearchApi,AkSearchConsole,AkSearchSearch,aksearchExt
+      APPLICATION_ENV: ${APPLICATION_ENV:-production}
     ports:
       - "80:80"
     volumes:
-      - ak-harvest:/var/www/local/harvest/alma
-      - ak-harvest-degruyter:/var/www/local/harvest/degruyter
-    networks:
-      - backend
-      - bridge
-    depends_on:
-      - ak-mysql
+      - thumbnails:/var/www/cache/covers
+      - harvest-alma:/var/www/local/harvest/bib_alma
+      - harvest-almamin:/var/www/local/harvest/bib_almamin
+      - harvest-archive-basis:/var/www/local/harvest/archive_basis
+      - harvest-archive-oeai:/var/www/local/harvest/archive_oeai
+      - harvest-archive-oeai-internal:/var/www/local/harvest/archive_oeai_internal
+      - harvest-isa-sample:/var/www/local/harvest/archive_isa_sample
+      - harvest-isa-dostal:/var/www/local/harvest/archive_isa_dostal
+      - harvest-isa-finke:/var/www/local/harvest/archive_isa_finke
+      - harvest-isa-escher:/var/www/local/harvest/archive_isa_escher
+      - harvest-degruyter:/var/www/local/harvest/bib_degruyter
+    depends_on: [mariadb]
+    networks: [backend]
+
 networks:
   backend:
-    driver: bridge
-  bridge:
+
 volumes:
-  ak-solrlogs:
-  ak-solrdata:
-  ak-mysql:
-  ak-harvest:
-  ak-harvest-degruyter:
+  solr-logs:
+  solr-data:
+  mariadb-data:
+  thumbnails:
+  harvest-alma:
+  harvest-almamin:
+  harvest-archive-basis:
+  harvest-archive-oeai:
+  harvest-archive-oeai-internal:
+  harvest-isa-sample:
+  harvest-isa-dostal:
+  harvest-isa-finke:
+  harvest-isa-escher:
+  harvest-degruyter:
