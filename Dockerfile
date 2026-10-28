@@ -18,9 +18,9 @@ RUN a2enmod rewrite &&\
     # Use vanila VuFind for a base and AkSearch only as modules but skip the main aksearch repo
     git clone --depth 1 -b v10.1.1 https://github.com/vufind-org/vufind.git /usr/local/vufind &&\
     git clone --depth 1 -b aksearch-10 https://github.com/acdh-oeaw/aksearch-module-core.git          /usr/local/vufind/module/AkSearch &&\
-    git clone --depth 1 -b aksearch-10 https://biapps.arbeiterkammer.at/gitlab/open/aksearch/module-api.git     /usr/local/vufind/module/AkSearchApi &&\
-    git clone --depth 1 -b aksearch-10 https://biapps.arbeiterkammer.at/gitlab/open/aksearch/module-console.git /usr/local/vufind/module/AkSearchConsole &&\
-    git clone --depth 1 -b aksearch-10 https://biapps.arbeiterkammer.at/gitlab/open/aksearch/module-search      /usr/local/vufind/module/AkSearchSearch &&\
+    git clone --depth 1 -b aksearch-10 https://github.com/acdh-oeaw/aksearch-module-api.git     /usr/local/vufind/module/AkSearchApi &&\
+    git clone --depth 1 -b aksearch-10 https://github.com/acdh-oeaw/aksearch-module-console.git /usr/local/vufind/module/AkSearchConsole &&\
+    git clone --depth 1 -b aksearch-10 https://github.com/acdh-oeaw/aksearch-module-search.git  /usr/local/vufind/module/AkSearchSearch &&\
     php /tmp/update-vufind-dependencies.php /usr/local/vufind/composer.json &&\
     ### Apache \
     chown -R www-data:www-data /var/www /usr/local/vufind &&\
