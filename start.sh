@@ -42,10 +42,38 @@ if [ -n "$PROXY_URL" ]; then
         exit 1
     fi
     PROXY_CONFIG="$VUFIND_LOCAL_DIR/config/vufind/config.ini"
-    if grep -qE '^host[[:space:]]*=' "$PROXY_CONFIG"; then
-        sed -i -E "s|^host[[:space:]]*=.*|host = $PROXY_HOST|; s|^port[[:space:]]*=.*|port = $PROXY_PORT|; s|^no_proxy[[:space:]]*=.*|no_proxy = \"${NO_PROXY:-}\"|" "$PROXY_CONFIG"
+    PROXY_CONFIG_TMP="$PROXY_CONFIG.tmp"
+    if awk -v proxy_host="$PROXY_HOST" -v proxy_port="$PROXY_PORT" -v no_proxy="${NO_PROXY:-}" '
+        function writeProxySettings() {
+            print "host = " proxy_host
+            print "port = " proxy_port
+            print "no_proxy = \"" no_proxy "\""
+        }
+        /^\[Proxy\]$/ {
+            print
+            inProxy = 1
+            foundProxy = 1
+            writeProxySettings()
+            next
+        }
+        inProxy && /^\[/ {
+            inProxy = 0
+        }
+        inProxy && /^[[:space:]]*;?[[:space:]]*(host|port|no_proxy)[[:space:]]*=/ {
+            next
+        }
+        { print }
+        END {
+            if (!foundProxy) {
+                exit 1
+            }
+        }
+    ' "$PROXY_CONFIG" > "$PROXY_CONFIG_TMP"; then
+        chmod --reference="$PROXY_CONFIG" "$PROXY_CONFIG_TMP"
+        mv "$PROXY_CONFIG_TMP" "$PROXY_CONFIG"
     else
-        sed -i "/^\[Proxy\]/a host = $PROXY_HOST\nport = $PROXY_PORT\nno_proxy = \"${NO_PROXY:-}\"" "$PROXY_CONFIG"
+        echo "Could not update the [Proxy] section in $PROXY_CONFIG"
+        exit 1
     fi
 fi
 
