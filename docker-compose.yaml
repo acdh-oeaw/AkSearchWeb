@@ -27,7 +27,7 @@ services:
     networks: [backend]
 
   web:
-    image: acdhch/aksearch-web:vufind10
+    image: acdhch/aksearch-web:dev
     environment:
       DB_HOST: mariadb
       DB_USER: ${DB_USER:-vufind}
