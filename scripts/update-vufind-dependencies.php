@@ -25,7 +25,7 @@ $updates = [
         'guzzlehttp/guzzle' => ['7.9.2', '7.16.0'],
         'league/commonmark' => ['2.5.3', '2.10.4'],
         'pear/http_request2' => ['2.6.0', '2.8.0'],
-        'symfony/yaml' => ['6.4.12', '6.4.48'],
+        'symfony/yaml' => ['6.4.12', '6.4.50'],
     ],
     'require-dev' => [
         'firebase/php-jwt' => ['6.10.1', '7.2.1'],
